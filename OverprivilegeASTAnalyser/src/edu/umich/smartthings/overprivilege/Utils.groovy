@@ -26,8 +26,13 @@ public class Utils
 			Vector<String> combination = new Vector<String>(n);
 			int j = 1;
 			for(Vector<String> vec : dataStructure.values()) {
-				int vecSize = vec.size().intValue()
-				combination.add(vec.get(((int) i/j) % vec.size().intValue()));
+				// combination.add(vec.get(((int) i/j) % vec.size().intValue()));
+				// the above line fails to compile. It has been broken out into individual steps below, which compiles successfully.
+				int vecSize = vec.size().intValue();
+				int sk =  ((int)i / j);
+				int amalgam = sk % vecSize;
+				String s = vec.get(amalgam);
+				combination.add(s);
 				j = j * vec.size().intValue();
 			}
 			allCombinations[i + 1] = combination.toArray(new String[n]);
