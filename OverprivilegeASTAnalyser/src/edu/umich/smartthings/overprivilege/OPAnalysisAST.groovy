@@ -1187,7 +1187,7 @@ class OPAnalysisAST extends CompilationCustomizer
 		if(reflIndex)
 		{
 			log.append "Dynamic Method Invocation"
-			OPAnalysisAST.this.append_manual()
+			OPAnalysisAST.append_manual()
 			numReflection += 1
 		}
 				
@@ -1209,7 +1209,7 @@ class OPAnalysisAST extends CompilationCustomizer
 		if(sameNameCommands.size() > 0 && (reqCmds.toList().size() > 0 || reqAttrs.toList().size() > 0))
 		{
 			log.append "Some app-defined methods have the same name as known IoT commands:"
-			OPAnalysisAST.this.append_manual()
+			OPAnalysisAST.append_manual()
 			sameNameCommands.each { it -> log.append it }
 		}
 			
@@ -1218,7 +1218,7 @@ class OPAnalysisAST extends CompilationCustomizer
 		if(sameNameAttrs.size() > 0 && (reqCmds.toList().size() > 0 || reqAttrs.toList().size() > 0))
 		{
 			log.append "Some app-defined globally-scoped properites have the same name as known IoT attributes:"
-			OPAnalysisAST.this.append_manual()
+			OPAnalysisAST.append_manual()
 			sameNameAttrs.each { it -> log.append it }
 		}
 		
@@ -1249,7 +1249,7 @@ class OPAnalysisAST extends CompilationCustomizer
 		if(insnVis.usesAddChildDevice)
 		{
 			log.append "addChildDevice usage"
-			OPAnalysisAST.this.append_manual()
+			OPAnalysisAST.append_manual()
 		}
 		
 		if (type2Uses_Cmds.toList().size() > 0)
