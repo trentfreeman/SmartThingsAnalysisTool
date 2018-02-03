@@ -108,8 +108,7 @@ class OPAnalysisAST extends CompilationCustomizer
 				
 		//to compute declared fields, you must inspect the run() method
 		//injected by the groovy compiler
-		
-		processApp(insnVis, declaredMethods)
+        processApp(insnVis, declaredMethods)
 		
 		//compute type 2 overprivilege as the number of unused
 		//capabilities. These unused capabilities come from the device
@@ -1182,7 +1181,10 @@ class OPAnalysisAST extends CompilationCustomizer
 		if(reqCmds.toList().size() == 0 && reqAttrs.toList().size() == 0)
 			return
 			
-		
+		for (String method : declaredMethods){
+		log.append method
+		}
+				
 		def reflIndex = calledMethods?.toList().any { v -> v?.contains("\$") }
 		if(reflIndex)
 		{
