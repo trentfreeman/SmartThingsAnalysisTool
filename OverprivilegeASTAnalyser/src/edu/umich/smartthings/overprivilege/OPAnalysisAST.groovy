@@ -1166,6 +1166,7 @@ class OPAnalysisAST extends CompilationCustomizer
 		
 		def reqCaps = insnVis.requestedCaps.intersect(allCapsList)
 		def declaredGlobals = insnVis.declaredGlobalVars
+		def afterMain = false
 								
 		log.append "req caps: " + reqCaps.toSet()
 		log.append "req cap size: " + reqCaps.size()
@@ -1180,9 +1181,13 @@ class OPAnalysisAST extends CompilationCustomizer
 		//this means that the app asks for no capabilities at all
 		if(reqCmds.toList().size() == 0 && reqAttrs.toList().size() == 0)
 			return
-			
-		for (String method : declaredMethods){
-		log.append method
+
+		log.append "Globals below"
+		for (String attr : declaredMethods){
+			if(attr == "main") 
+				afterMain = true
+			else if (afterMain == true)
+				log.append attr
 		}
 				
 		def reflIndex = calledMethods?.toList().any { v -> v?.contains("\$") }
