@@ -18,7 +18,7 @@ class AnalysisDriver
 	
 	static main(def args)
 	{
-		def project_root = "/" //REPLACE with your project root
+		def project_root = "C:/Users/trent/Google Drive/Reed/Thesis/SmartThingsAnalysisTool/" //REPLACE with your project root
 		
 		def outputfilename = project_root + "/" + "overprivout.txt"
 		def capsAsPerSamsungFile = project_root + "/" + "Capabilities.csv"

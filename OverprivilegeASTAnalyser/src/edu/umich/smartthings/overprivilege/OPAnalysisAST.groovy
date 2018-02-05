@@ -22,12 +22,16 @@ import org.codehaus.groovy.ast.expr.NamedArgumentListExpression
 import org.codehaus.groovy.ast.expr.PropertyExpression
 import org.codehaus.groovy.ast.expr.TupleExpression
 import org.codehaus.groovy.ast.expr.VariableExpression
+import org.codehaus.groovy.ast.stmt.BlockStatement
+import org.codehaus.groovy.ast.stmt.Statement
+import org.codehaus.groovy.ast.Parameter
 import org.codehaus.groovy.classgen.GeneratorContext
 import org.codehaus.groovy.control.CompilePhase
 import org.codehaus.groovy.control.SourceUnit
 import org.codehaus.groovy.control.customizers.CompilationCustomizer
 import org.codehaus.groovy.transform.GroovyASTTransformation
 import org.codehause.groovyx.gpars.*
+
 
 @GroovyASTTransformation(phase = CompilePhase.SEMANTIC_ANALYSIS)
 class OPAnalysisAST extends CompilationCustomizer
@@ -87,7 +91,38 @@ class OPAnalysisAST extends CompilationCustomizer
 		
 		log = logger
 	}
-	
+	public String makeTreeBranching(String methTree, List<Statement> statements) {
+		if (statements.size()> 0) { 
+			if (statements.first().getClass() == org.codehaus.groovy.ast.stmt.ExpressionStatement) {
+				//ADD CODE HERE
+				//add for attribute change or local var change
+				if (statements.first().getText().contains("atomicState.") || statements.first().getText().contains("state.") )
+					methTree = methTree + "[" + statements.first().getText() + "], "
+				statements.removeAt(0)
+				methTree = makeTreeBranching(methTree, statements)
+				return methTree
+			}else if (statements.first().getClass() == org.codehaus.groovy.ast.stmt.IfStatement) {
+				//ADD CODE HERE
+				//Must Check each branch of if loop recursively for more statements
+				methTree = methTree + "[If],"
+				statements.removeAt(0)
+				methTree = makeTreeBranching(methTree, statements)
+				return methTree
+			}else if (statements.first().getClass() == org.codehaus.groovy.ast.stmt.ForStatement) {
+				//ADD CODE HERE
+				//Again recursively check for more statements
+				//Use picture at https://en.wikipedia.org/wiki/Abstract_syntax_tree to get idea how to format
+				methTree = methTree + "[For]"
+				statements.removeAt(0)
+				methTree = makeTreeBranching(methTree, statements)
+				return methTree
+			}else {
+				println "no code yet for class" + statements.first().getClass()
+				return methTree
+			}
+		}else
+			return methTree
+	}
 	@Override
 	void call(SourceUnit source, GeneratorContext context, ClassNode classNode) {
 		
@@ -101,8 +136,31 @@ class OPAnalysisAST extends CompilationCustomizer
 		classNode.visitContents(insnVis)
 		
 		def allMethodNodes = classNode.getAllDeclaredMethods()
+		def afterMain = false
+		def methTree = ""
+		println "DECLARED METHODS"
+		log.append("DECLARED METHODS")
+		for (MethodNode meth : allMethodNodes){
+			methTree = ""
+			if (meth.getName() == "main")
+				afterMain = true
+			else if (afterMain == true && meth.getName() != "") {
+				methTree = meth.getName() + ": " + meth.getText() + "["
+				println methTree
+				if (meth.getCode() instanceof BlockStatement) {
+					List<Statement> statements = (List<Statement>) ((BlockStatement) meth.getCode()).getStatements()
+					methTree = makeTreeBranching(methTree, statements)
+					methTree = methTree + "]"
+					log.append(methTree)
+						//println state.getText()
+				}
+			}
+		}
 		def allFieldNodes = classNode.getFields()
-		
+		println "FIELDS"
+		for (String meth : allFieldNodes){
+			println meth
+		}
 		ArrayList<String> declaredMethods = new ArrayList<String>()
 		allMethodNodes.each { it -> declaredMethods.add(it.getName().toLowerCase()) }
 				
@@ -127,6 +185,7 @@ class OPAnalysisAST extends CompilationCustomizer
 			globals = new ArrayList<String>()
 			dexpressions = new ArrayList<DeclarationExpression>()
 			bexpressions = new ArrayList<BinaryExpression>()
+			
 		}
 		
 		@Override
@@ -203,7 +262,8 @@ class OPAnalysisAST extends CompilationCustomizer
 		{
 			//println mce.getMethodAsString()
 			def methText
-				
+			//trying to get full method path as tree structure
+			//def methPath
 			
 			if(mce.getMethodAsString() == null)
 			{
@@ -215,8 +275,11 @@ class OPAnalysisAST extends CompilationCustomizer
 				methText = mce.getMethodAsString()
 			}
 			
+			//println methText
+			
 			//determine the receiver of the method call
 			def recver = mce.getReceiver()
+			//println "this is the Reciever for " + methText + ": " + recver.getText()
 			if(recver instanceof VariableExpression)
 			{
 				VariableExpression recvex = (VariableExpression) recver
@@ -1182,7 +1245,14 @@ class OPAnalysisAST extends CompilationCustomizer
 		if(reqCmds.toList().size() == 0 && reqAttrs.toList().size() == 0)
 			return
 
-		log.append "Globals below"
+		for (DeclarationExpression dex : insnVis.alldexprs){
+			println dex.getText()
+		}
+		println "^dex \\/bex"
+		for (BinaryExpression bex : insnVis.allbexprs){
+			println bex.getText()
+		}
+		log.append "Methods below"
 		for (String attr : declaredMethods){
 			if(attr == "main") 
 				afterMain = true
