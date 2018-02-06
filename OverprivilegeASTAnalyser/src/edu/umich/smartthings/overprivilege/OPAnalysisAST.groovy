@@ -12,6 +12,7 @@ package edu.umich.smartthings.overprivilege
 import org.codehaus.groovy.ast.ClassCodeVisitorSupport
 import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.ast.MethodNode
+import org.codehaus.groovy.ast.*
 import org.codehaus.groovy.ast.expr.BinaryExpression
 import org.codehaus.groovy.ast.expr.ConstantExpression
 import org.codehaus.groovy.ast.expr.DeclarationExpression
@@ -23,6 +24,7 @@ import org.codehaus.groovy.ast.expr.PropertyExpression
 import org.codehaus.groovy.ast.expr.TupleExpression
 import org.codehaus.groovy.ast.expr.VariableExpression
 import org.codehaus.groovy.ast.stmt.BlockStatement
+import org.codehaus.groovy.ast.stmt.IfStatement
 import org.codehaus.groovy.ast.stmt.Statement
 import org.codehaus.groovy.ast.Parameter
 import org.codehaus.groovy.classgen.GeneratorContext
@@ -93,7 +95,10 @@ class OPAnalysisAST extends CompilationCustomizer
 	}
 	public String makeTreeBranching(String methTree, List<Statement> statements) {
 		if (statements.size()> 0) { 
-			if (statements.first().getClass() == org.codehaus.groovy.ast.stmt.ExpressionStatement) {
+			if (statement.first() instanceof BlockStatement) {
+				List<Statement> states = (List<Statement>) ((BlockStatement) statements.first().getStatements())
+				methTree = makeTreeBranching(methTree, statements)
+			}else if (statements.first().getClass() == org.codehaus.groovy.ast.stmt.ExpressionStatement) {
 				//ADD CODE HERE
 				//add for attribute change or local var change
 				if (statements.first().getText().contains("atomicState.") || statements.first().getText().contains("state.") )
@@ -104,7 +109,9 @@ class OPAnalysisAST extends CompilationCustomizer
 			}else if (statements.first().getClass() == org.codehaus.groovy.ast.stmt.IfStatement) {
 				//ADD CODE HERE
 				//Must Check each branch of if loop recursively for more statements
-				methTree = methTree + "[If],"
+				methTree = methTree + "[If " + statements.first().getBooleanExpression().getText() + ","
+				methTree = methTree + makeTreeBranching("", statements.first().getIfBlock()) + ","
+				methTree = methTree + makeTreeBranching("",statements.first().getElseBlock()) + "],"
 				statements.removeAt(0)
 				methTree = makeTreeBranching(methTree, statements)
 				return methTree

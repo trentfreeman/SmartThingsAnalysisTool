@@ -1,0 +1,26 @@
+
+--app-start--
+processing app_test
+DECLARED METHODS
+installed: public java.lang.Object installed()  { ... }[]
+updated: public java.lang.Object updated()  { ... }[]
+--app-start--
+processing app_test
+DECLARED METHODS
+installed: public java.lang.Object installed()  { ... }[]
+updated: public java.lang.Object updated()  { ... }[]
+--app-start--
+processing app_test
+DECLARED METHODS
+installed: public java.lang.Object installed()  { ... }[]
+updated: public java.lang.Object updated()  { ... }[]
+--app-start--
+processing app_test
+DECLARED METHODS
+installed: public java.lang.Object installed()  { ... }[]
+updated: public java.lang.Object updated()  { ... }[]
+--app-start--
+processing app_test
+DECLARED METHODS
+installed: public java.lang.Object installed()  { ... }[]
+updated: public java.lang.Object updated()  { ... }[]
