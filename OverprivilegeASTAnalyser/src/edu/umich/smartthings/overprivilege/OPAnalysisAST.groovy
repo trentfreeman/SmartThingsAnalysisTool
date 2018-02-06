@@ -183,8 +183,8 @@ class OPAnalysisAST extends CompilationCustomizer
 			//println state.getText()
 		def allFieldNodes = classNode.getFields()
 		println "FIELDS"
-		for (String meth : allFieldNodes){
-			println meth
+		for (String field : allFieldNodes){
+			println field
 		}
 		ArrayList<String> declaredMethods = new ArrayList<String>()
 		allMethodNodes.each { it -> declaredMethods.add(it.getName().toLowerCase()) }
@@ -197,7 +197,6 @@ class OPAnalysisAST extends CompilationCustomizer
 		//capabilities. These unused capabilities come from the device
 		//handlers that implement multiple capabilities
 		computeType2Overprivilege(insnVis, declaredMethods)
-		println "where am i crashing 3"
 	}
 	
 	class MethodCodeVisitor extends ClassCodeVisitorSupport
@@ -1148,7 +1147,6 @@ class OPAnalysisAST extends CompilationCustomizer
 			comb2overpriv.add(sc)
 			
 		}
-		println "where am i crashing 1"
 		//now select the minimum amount of extraneous caps
 		//and report that as the type 2 overprivilege for this app
 		
@@ -1170,7 +1168,6 @@ class OPAnalysisAST extends CompilationCustomizer
 			
 			type2_numCaps += 1
 		}
-		println "where am i crashing 2"
 		//part 2: compute whether the app is using any type 2 cmd/attributes
 		//we want to compute the set of ALL cmds/attrs possible for this
 		//particular app using the set of devicehandlers that we have
