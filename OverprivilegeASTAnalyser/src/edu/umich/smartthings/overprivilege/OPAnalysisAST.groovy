@@ -61,6 +61,9 @@ class OPAnalysisAST extends CompilationCustomizer
 	int numOAuth
 	int numInternet
 	
+	//more stuff 0 for no state or atomicState, 1 for State, 2 for Atomic State
+	int stateHolder = 0
+	
 	Logger log
 	
 	public OPAnalysisAST(Logger logger)
@@ -94,24 +97,35 @@ class OPAnalysisAST extends CompilationCustomizer
 		log = logger
 	}
 	public String makeTreeBranching(String methTree, List<Statement> statements) {
-		if (statements.size()> 0) { 
-			if (statement.first() instanceof BlockStatement) {
-				List<Statement> states = (List<Statement>) ((BlockStatement) statements.first().getStatements())
-				methTree = makeTreeBranching(methTree, statements)
+		if (!statements.isEmpty()) { 
+			if (statements.first() instanceof BlockStatement) {
+				List<Statement> states = (List<Statement>) ((BlockStatement) statements.first()).getStatements()
+				methTree = makeTreeBranching(methTree, states)
 			}else if (statements.first().getClass() == org.codehaus.groovy.ast.stmt.ExpressionStatement) {
 				//ADD CODE HERE
 				//add for attribute change or local var change
-				if (statements.first().getText().contains("atomicState.") || statements.first().getText().contains("state.") )
+				if (statements.first().getText().contains("atomicState.") ) {
+					stateHolder = 2
 					methTree = methTree + "[" + statements.first().getText() + "], "
+				}else if (statements.first().getText().contains("state.") ) {
+					stateHolder = 1
+					methTree = methTree + "[" + statements.first().getText() + "], "
+				//}else if (statements.first().getText().contains("state.") ) {
+				//	stateHolder = 1
+				//	methTree = methTree + "[" + statements.first().getText() + "], "
+				} else
+					methTree = methTree + "[nothingHere]"
 				statements.removeAt(0)
 				methTree = makeTreeBranching(methTree, statements)
 				return methTree
 			}else if (statements.first().getClass() == org.codehaus.groovy.ast.stmt.IfStatement) {
-				//ADD CODE HERE
-				//Must Check each branch of if loop recursively for more statements
+				def ifStatementCopy = statements.first()
 				methTree = methTree + "[If " + statements.first().getBooleanExpression().getText() + ","
-				methTree = methTree + makeTreeBranching("", statements.first().getIfBlock()) + ","
-				methTree = methTree + makeTreeBranching("",statements.first().getElseBlock()) + "],"
+				statements.add(0, ifStatementCopy.getIfBlock()) 
+				println statements.getClass()
+				methTree = methTree + makeTreeBranching("", statements) + ","
+				statements.add(0, ifStatementCopy.getElseBlock()) 
+				methTree = methTree + makeTreeBranching("",statements) + "],"
 				statements.removeAt(0)
 				methTree = makeTreeBranching(methTree, statements)
 				return methTree
@@ -119,12 +133,14 @@ class OPAnalysisAST extends CompilationCustomizer
 				//ADD CODE HERE
 				//Again recursively check for more statements
 				//Use picture at https://en.wikipedia.org/wiki/Abstract_syntax_tree to get idea how to format
-				methTree = methTree + "[For]"
+				methTree = methTree + "[For " + statements.first().getCollectionExpression().getText() + "]"
+				//methTree = methTree + makeTreeBranching("", statements) + ", "
+				//methTree = methTree + makeTreeBranching("", statements) + "]"
 				statements.removeAt(0)
-				methTree = makeTreeBranching(methTree, statements)
+				methTree = methTree + makeTreeBranching(methTree, statements)
 				return methTree
 			}else {
-				println "no code yet for class" + statements.first().getClass()
+				log.append("no code yet for class" + statements.first().getClass())
 				return methTree
 			}
 		}else
@@ -152,17 +168,23 @@ class OPAnalysisAST extends CompilationCustomizer
 			if (meth.getName() == "main")
 				afterMain = true
 			else if (afterMain == true && meth.getName() != "") {
-				methTree = meth.getName() + ": " + meth.getText() + "["
+				methTree = meth.getName() + ": "
+				//ADD CODE
+				//above add parameters into methods
 				println methTree
 				if (meth.getCode() instanceof BlockStatement) {
 					List<Statement> statements = (List<Statement>) ((BlockStatement) meth.getCode()).getStatements()
 					methTree = makeTreeBranching(methTree, statements)
-					methTree = methTree + "]"
 					log.append(methTree)
-						//println state.getText()
+
 				}
 			}
 		}
+		if (stateHolder == 1)
+			log.append("IT HAS STATE")
+		else if (stateHolder == 2)
+			log.append("IT HAS ATOMICSTATE")
+			//println state.getText()
 		def allFieldNodes = classNode.getFields()
 		println "FIELDS"
 		for (String meth : allFieldNodes){
@@ -634,7 +656,7 @@ class OPAnalysisAST extends CompilationCustomizer
 				//subscription? I don't know. So I'm marking this for manual
 				//analysis
 				log.append "subscribeToCommand"
-				OPAnalysisAST.this.append_manual()
+				//OPAnalysisAST.append_manual()
 			}
 			
 			if(methText.equals("subscribe"))
@@ -680,12 +702,12 @@ class OPAnalysisAST extends CompilationCustomizer
 						else
 						{
 							log.append "subscribe: not a ConstantExpression!"
-							OPAnalysisAST.this.append_manual()
+							//OPAnalysisAST.append_manual()
 							
 							if(! (args[0] instanceof VariableExpression))
 							{
 								log.append "subscribe: first arg not a VariableExpression"
-								OPAnalysisAST.this.append_manual()
+								//OPAnalysisAST.append_manual()
 							}
 						}
 					}
@@ -740,7 +762,7 @@ class OPAnalysisAST extends CompilationCustomizer
 					else
 					{
 						log.append mce.getMethodAsString() + ", arg not ConstantExpression"
-						OPAnalysisAST.this.append_manual()
+						//OPAnalysisAST.append_manual()
 					}
 				}
 			}
@@ -761,7 +783,7 @@ class OPAnalysisAST extends CompilationCustomizer
 					else
 					{
 						log.append mce.getMethodAsString() + ", arg not ConstantExpression"
-						OPAnalysisAST.this.append_manual()
+						//OPAnalysisAST.append_manual()
 					}
 				}
 			}
@@ -781,7 +803,7 @@ class OPAnalysisAST extends CompilationCustomizer
 				else
 				{
 					log.append mce.getMethodAsString() + ", arg not ConstantExpression"
-					OPAnalysisAST.this.append_manual()
+					//OPAnalysisAST.append_manual()
 				}
 			}
 			
@@ -804,7 +826,7 @@ class OPAnalysisAST extends CompilationCustomizer
 				//device in the first place. therefore, we do not
 				//count it as overprivilege.
 				//log.append("addChildDevice usage")
-				//OPAnalysisAST.this.append_manual()
+				//OPAnalysisAST.append_manual()
 				usesAddChildDevice = true
 			}
 			
@@ -1271,7 +1293,7 @@ class OPAnalysisAST extends CompilationCustomizer
 		if(reflIndex)
 		{
 			log.append "Dynamic Method Invocation"
-			OPAnalysisAST.append_manual()
+			//OPAnalysisAST.append_manual()
 			numReflection += 1
 		}
 				
@@ -1293,7 +1315,7 @@ class OPAnalysisAST extends CompilationCustomizer
 		if(sameNameCommands.size() > 0 && (reqCmds.toList().size() > 0 || reqAttrs.toList().size() > 0))
 		{
 			log.append "Some app-defined methods have the same name as known IoT commands:"
-			OPAnalysisAST.append_manual()
+			//OPAnalysisAST.append_manual()
 			sameNameCommands.each { it -> log.append it }
 		}
 			
@@ -1302,7 +1324,7 @@ class OPAnalysisAST extends CompilationCustomizer
 		if(sameNameAttrs.size() > 0 && (reqCmds.toList().size() > 0 || reqAttrs.toList().size() > 0))
 		{
 			log.append "Some app-defined globally-scoped properites have the same name as known IoT attributes:"
-			OPAnalysisAST.append_manual()
+			//OPAnalysisAST.append_manual()
 			sameNameAttrs.each { it -> log.append it }
 		}
 		
@@ -1333,7 +1355,7 @@ class OPAnalysisAST extends CompilationCustomizer
 		if(insnVis.usesAddChildDevice)
 		{
 			log.append "addChildDevice usage"
-			OPAnalysisAST.append_manual()
+			//OPAnalysisAST.append_manual()
 		}
 		
 		if (type2Uses_Cmds.toList().size() > 0)

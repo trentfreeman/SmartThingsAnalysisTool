@@ -2,25 +2,523 @@
 --app-start--
 processing app_test
 DECLARED METHODS
-installed: public java.lang.Object installed()  { ... }[]
-updated: public java.lang.Object updated()  { ... }[]
+installed: [nothingHere][nothingHere]
+updated: [nothingHere][nothingHere][nothingHere]
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+presence: [nothingHere][If (evt.value == not present),[If (location.mode != newMode),[nothingHere][If this.everyoneIsAway(),[nothingHere][nothingHere],],,[nothingHere]],,[nothingHere]],
+takeAction: [If this.everyoneIsAway(),[nothingHere][nothingHere][nothingHere][If (awayLongEnough.size() == people.size()),[nothingHere][nothingHere][nothingHere][nothingHere],[nothingHere]],,[nothingHere]],
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+everyoneIsAway: [nothingHere][For people]everyoneIsAway: [nothingHere][For people][nothingHere]
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+send: [If location.contactBookEnabled,[nothingHere][nothingHere],[If (sendPushMessage != No),[nothingHere][nothingHere],],],
+findFalseAlarmThreshold: [nothingHere]
+req caps: [capability.presencesensor]
+req cap size: 1
+requested commands:[]
+requested attrs:[presence]
+Methods below
+installed
+updated
+presence
+takeaction
+everyoneisaway
+send
+findfalsealarmthreshold
+called cap-methods by app
+called cap-props by app
+presence
+attribute uses through subscriptions
+presence
+cmd overpriv:[]
+attr overpriv:[]
 --app-start--
-processing app_test
+processing curb-energy-monitor.groovy
 DECLARED METHODS
-installed: public java.lang.Object installed()  { ... }[]
-updated: public java.lang.Object updated()  { ... }[]
+installed: [nothingHere]
+updated: [nothingHere][nothingHere][nothingHere][nothingHere]
+initialize: [nothingHere][nothingHere][nothingHere][nothingHere][nothingHere][nothingHere]
+uninstalled: [nothingHere][nothingHere]
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+authPage: [If atomicState.accessToken,[(atomicState.accessToken = this.createAccessToken())], ,],
+oauthInitUrl: [(atomicState.oauthInitState = java.util.UUID.randomUUID().toString())], [nothingHere][nothingHere]
+callback: [nothingHere][nothingHere][If (oauthState == atomicState.oauthInitState),[nothingHere][nothingHere][If atomicState.authToken,[nothingHere],[nothingHere]],,[log.error(callback() failed oauthState != atomicState.oauthInitState)], ],
+removeChildDevices: [nothingHere]
+no code yet for classclass org.codehaus.groovy.ast.stmt.TryCatchStatement
+getCurbLocations: [(params = [uri:http://app.energycurb.com, path:/api/locations, headers:[Authorization:Bearer $atomicState.authToken]])], 
+updateSelectedLocationId: [nothingHere][atomicState.locationLookup.each({ -> ... })], [(atomicState.location = location)], 
+no code yet for classclass org.codehaus.groovy.ast.stmt.TryCatchStatement
+updateChildDevice: 
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+createChildDevice: 
+getDevices: [(params = [uri:https://app.energycurb.com, path:/api/latest/$atomicState.location, headers:[Authorization:Bearer $atomicState.authToken], ... ])], [nothingHere]
+getAllData: [(billingParams = [uri:https://app.energycurb.com, path:/api/aggregate/$atomicState.location/billing/h, headers:[Authorization:Bearer $atomicState.authToken], ... ])], [nothingHere][(latestparams = [uri:https://app.energycurb.com, path:/api/aggregate/$atomicState.location/1m/s, headers:[Authorization:Bearer $atomicState.authToken], ... ])], [nothingHere]
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+processUsage: [If resp.hasError(),[nothingHere][nothingHere],],
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+processDevices: [If resp.hasError(),[nothingHere],],
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+processKwh: [If resp.hasError(),[nothingHere][nothingHere],],
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+toQueryString: 
+refreshAuthToken: [If atomicState.refreshToken,[nothingHere],[(tokenParams = [grant_type:refresh_token, client_id:appSettings.clientId, client_secret:appSettings.clientSecret, refresh_token:atomicState.refreshToken])], [nothingHere]],
+success: [nothingHere][nothingHere]
+fail: [nothingHere][nothingHere]
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+connectionStatus: [nothingHere][If redirectUrl,[nothingHere],],
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+getCurbAuthUrl: 
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+getCurbLoginUrl: 
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+getCurbTokenUrl: 
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+getServerUrl: 
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+getShardUrl: 
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+getCallbackUrl: 
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+getBuildRedirectUrl: 
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+getApiEndpoint: 
+IT HAS ATOMICSTATE
+req caps: []
+req cap size: 0
+requested commands:[]
+requested attrs:[]
+missing method: groovy.lang.MissingMethodException: No signature of method: curb-energy-monitor.include() is applicable for argument types: (java.lang.String) values: [asynchttp_v1]
+Possible solutions: installed(), evaluate(java.lang.String)
 --app-start--
-processing app_test
+processing energy-alerts.groovy
 DECLARED METHODS
-installed: public java.lang.Object installed()  { ... }[]
-updated: public java.lang.Object updated()  { ... }[]
+installed: [nothingHere][nothingHere]
+updated: [nothingHere][nothingHere][nothingHere]
+initialize: [nothingHere]
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+meterHandler: [nothingHere][If atomicState.lastValue,[(atomicState.lastValue = meterValue)], ,],
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+sendMessage: [If location.contactBookEnabled,[nothingHere],[If sms,[nothingHere],],],
+IT HAS ATOMICSTATE
+req caps: [capability.powermeter]
+req cap size: 1
+requested commands:[]
+requested attrs:[power]
+Methods below
+installed
+updated
+initialize
+meterhandler
+sendmessage
+called cap-methods by app
+called cap-props by app
+power
+attribute uses through subscriptions
+power
+cmd overpriv:[]
+attr overpriv:[]
+type2 overprivilege unused caps:
+type2 driver combination: [b100c5ad-6d43-4adf-89f9-4109995e059d]
+[[capability.refresh]]
 --app-start--
-processing app_test
+processing gentle-wake-up.groovy
 DECLARED METHODS
-installed: public java.lang.Object installed()  { ... }[]
-updated: public java.lang.Object updated()  { ... }[]
+rootPage: [nothingHere]
+unsupportedDevicesPage: [nothingHere][nothingHere]
+controllerExplanationPage: [nothingHere]
+numbersPage: [nothingHere]
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+defaultStart: [If ((this.usesOldSettings() && direction) && (direction == Down)),,],
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+defaultEnd: [If ((this.usesOldSettings() && direction) && (direction == Down)),,],
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+startLevelLabel: [If this.usesOldSettings(),[If (direction && (direction == Down)),,],,],
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+endLevelLabel: [If this.usesOldSettings(),[If (direction && (direction == Down)),,],,],
+weekdays: [nothingHere]
+weekends: [nothingHere]
+schedulingPage: [nothingHere]
+completionPage: [nothingHere]
+installed: [nothingHere][nothingHere]
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+updated: [nothingHere][nothingHere][nothingHere][If controller,[nothingHere],],
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+initialize: [nothingHere][If startTime,[nothingHere][nothingHere],],
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+appHandler: [nothingHere][If (evt.value == touch),[If atomicState.running,[nothingHere],[nothingHere]],,],
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+locationHandler: [nothingHere][If modeStart,,],
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+stopDimmersHandler: [nothingHere][nothingHere][If ((percentComplete > 2) && (percentComplete < 98)),[If (manualOverride == cancel),[nothingHere][nothingHere],[If (manualOverride == jumpTo),[nothingHere][nothingHere][nothingHere],],],[If (manualOverride == jumpTo),,],,[nothingHere]],
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+scheduledStart: [If this.canStartAutomatically(),[nothingHere],],
+start: [nothingHere][nothingHere][nothingHere][(atomicState.running = true)], [(atomicState.runCounter = 0)], [(atomicState.start = new java.util.Date().getTime())], [nothingHere][nothingHere]
+stop: [nothingHere][nothingHere][(atomicState.running = false)], [(atomicState.start = 0)], [(atomicState.runCounter = 0)], [nothingHere]
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+healthCheck: [nothingHere][If atomicState.running,,],
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+sendStartEvent: [nothingHere][nothingHere][If (source == modeChange),[nothingHere],[If (source == schedule),[nothingHere],[If (source == appTouch),[nothingHere],[If (source == controller),[nothingHere],],],[If (source == controller),,],],[If (source == controller),,],],[If (source == controller),,],
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+sendStopEvent: [nothingHere][nothingHere][If (source == modeChange),[nothingHere][nothingHere],[If (source == schedule),[nothingHere],[If (source == appTouch),[nothingHere][nothingHere],[If (source == controller),[nothingHere][nothingHere],[If (source == settingsChange),[nothingHere][nothingHere],[If (source == manualOverride),[nothingHere][nothingHere],],],[If (source == manualOverride),,],],[If (source == manualOverride),,],],[If (source == manualOverride),,],],[If (source == manualOverride),,],],[If (source == manualOverride),,],
+sendTimeRemainingEvent: [nothingHere][nothingHere][nothingHere][nothingHere][nothingHere][nothingHere][nothingHere]
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+sendControllerEvent: [nothingHere][If controller,[nothingHere],],
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+getController: [(dni = state.controllerDni)], [If dni,[nothingHere],],
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+increment: [If atomicState.running,,],
+updateDimmers: [nothingHere][nothingHere]
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+dynamicLevel: [(start = atomicState.startLevels[dimmer.id])], [nothingHere][If percentComplete,,],
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+completion: [nothingHere][If atomicState.running,,],
+handleCompletionSwitches: [nothingHere]
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+handleCompletionMessaging: [If completionMessage,[If location.contactBookEnabled,[nothingHere],[If completionPhoneNumber,[nothingHere],],],,],
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+handleCompletionModesAndPhrases: [If completionMode,[nothingHere],],
+speak: [nothingHere][nothingHere][nothingHere][nothingHere][nothingHere][nothingHere]
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+resumePlaying: [nothingHere][nothingHere][If sonos,[nothingHere][If (currentTrack.status == playing),[nothingHere],[nothingHere]],,],
+setLevelsInState: [nothingHere][nothingHere][(atomicState.startLevels = startLevels)], 
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+canStartAutomatically: [nothingHere][nothingHere][If (days || days.contains(today)),,],
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+completionPercentage: [nothingHere][If atomicState.running,,],
+totalRunTimeMillis: [nothingHere][nothingHere]
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+convertToMillis: [nothingHere][nothingHere]
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+timeRemaining: [nothingHere][nothingHere][nothingHere][nothingHere]
+millisToEnd: [nothingHere]
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+displayableTime: [nothingHere][nothingHere][If parts.size(),,],
+jumpTo: [nothingHere][nothingHere][nothingHere][nothingHere][nothingHere][(atomicState.start = shiftedStart)], [nothingHere][nothingHere]
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+dynamicEndLevel: [If this.usesOldSettings(),[If (direction && (direction == Down)),,],,],
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+getHue: [(start = (int) atomicState.startLevels[dimmer.id])], [nothingHere][If (start > end),,],
+getUpHue: [nothingHere]
+getDownHue: [nothingHere]
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+getBlueHue: [If (level < 5),,],
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+getRedHue: [If (level < 6),,],
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+dimmersContainUnsupportedDevices: [nothingHere]
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+hasSetLevelCommand: 
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+hasSetColorCommand: 
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+hasCommand: 
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+dimmersWithSetColorCommand: [nothingHere][nothingHere]
+no code yet for classclass org.codehaus.groovy.ast.stmt.TryCatchStatement
+sanitizeInt: 
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+completionDelaySeconds: [nothingHere][nothingHere]
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+stepDuration: [nothingHere][nothingHere]
+debug: [nothingHere]
+smartThingsDateFormat: [nothingHere]
+humanReadableStartDate: [nothingHere]
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+fancyString: [nothingHere]
+fancyDeviceString: [nothingHere]
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+deviceLabel: 
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+schedulingHrefDescription: [nothingHere][If days,[If (days == this.weekdays()),[nothingHere],[If (days == this.weekends()),[nothingHere],[nothingHere]],],[If (days == this.weekends()),,],,],
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+completionHrefDescription: [nothingHere][nothingHere][If completionSwitches,[nothingHere][nothingHere][nothingHere][If switchesList,[nothingHere],],,],
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+numbersPageHrefDescription: [nothingHere][If colorize,[nothingHere][If (colorDimmers == dimmers),[nothingHere],[nothingHere]],,],
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+hueSatToHex: [nothingHere]
+hslToRgb: [nothingHere][nothingHere][nothingHere][If (s == 0),[nothingHere],[nothingHere][nothingHere][nothingHere][nothingHere][nothingHere][nothingHere]],
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+rgbToHex: [nothingHere][nothingHere]
+usesOldSettings: [nothingHere]
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+hasStartLevel: 
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+hasEndLevel: 
+IT HAS ATOMICSTATE
+req caps: [capability.musicplayer, capability.switchlevel, capability.switch, capability.sensor]
+req cap size: 4
+requested commands:[play, playtrack, mute, playtext, nexttrack, restoretrack, pause, off, settrack, resumetrack, previoustrack, setlevel, stop, unmute, on]
+requested attrs:[trackdescription, trackdata, mute, level, status, switch]
+Methods below
+rootpage
+unsupporteddevicespage
+controllerexplanationpage
+numberspage
+defaultstart
+defaultend
+startlevellabel
+endlevellabel
+weekdays
+weekends
+schedulingpage
+completionpage
+installed
+updated
+initialize
+apphandler
+locationhandler
+stopdimmershandler
+scheduledstart
+start
+stop
+healthcheck
+sendstartevent
+sendstopevent
+sendtimeremainingevent
+sendcontrollerevent
+getcontroller
+increment
+updatedimmers
+dynamiclevel
+completion
+handlecompletionswitches
+handlecompletionmessaging
+handlecompletionmodesandphrases
+speak
+resumeplaying
+setlevelsinstate
+canstartautomatically
+completionpercentage
+totalruntimemillis
+converttomillis
+timeremaining
+millistoend
+displayabletime
+jumpto
+dynamicendlevel
+gethue
+getuphue
+getdownhue
+getbluehue
+getredhue
+dimmerscontainunsupporteddevices
+hassetlevelcommand
+hassetcolorcommand
+hascommand
+dimmerswithsetcolorcommand
+sanitizeint
+completiondelayseconds
+stepduration
+debug
+smartthingsdateformat
+humanreadablestartdate
+fancystring
+fancydevicestring
+devicelabel
+schedulinghrefdescription
+completionhrefdescription
+numberspagehrefdescription
+huesattohex
+hsltorgb
+rgbtohex
+usesoldsettings
+hasstartlevel
+hasendlevel
+Dynamic Method Invocation
+Some app-defined methods have the same name as known IoT commands:
+speak
+stop
+addChildDevice usage
+type 2 command uses
+setcolor
+called cap-methods by app
+playtrack
+off
+settrack
+setlevel
+called cap-props by app
+trackdata
+level
+status
+switch
+attribute uses through subscriptions
+level
+trackdata
+switch
+cmd overpriv:[play, mute, playtext, nexttrack, restoretrack, pause, resumetrack, previoustrack, stop, unmute, on]
+attr overpriv:[trackdescription, mute]
+^^^^^^^^-OVERPRIVILEGED-^^^^^^^
+type2 overprivilege unused caps:
+type2 driver combination: [6d38663a-1703-46b6-9939-8c1fb9467cf9, 5d3d201d-c4b4-4354-81e9-39d6d728e2c0, 8a9d4b1e3b8af959013b8af9d183000e, 26637648-3292-11e2-9c79-22000a1dc790]
+[[capability.motionsensor, capability.refresh]]
 --app-start--
-processing app_test
+processing initial-state-event-streamer.groovy
 DECLARED METHODS
-installed: public java.lang.Object installed()  { ... }[]
-updated: public java.lang.Object updated()  { ... }[]
+getAccessKey: [nothingHere][If (atomicState.accessKey == null),[nothingHere],[[accessKey:atomicState.accessKey]], ],
+getBucketKey: [nothingHere][If (atomicState.bucketKey == null),[nothingHere],[[bucketKey:atomicState.bucketKey, bucketName:atomicState.bucketName]], ],
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+setBucketKey: [nothingHere][nothingHere][nothingHere][nothingHere][nothingHere][If (newBucketKey && ((newBucketKey != atomicState.bucketKey) || (newBucketName != atomicState.bucketName))),[(atomicState.bucketKey = $newBucketKey)], [(atomicState.bucketName = $newBucketName)], [(atomicState.isBucketCreated = false)], ,],
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+setAccessKey: [nothingHere][nothingHere][nothingHere][If ((newGrokerSubdomain && (newGrokerSubdomain != )) && (newGrokerSubdomain != atomicState.grokerSubdomain)),[(atomicState.grokerSubdomain = $newGrokerSubdomain)], [(atomicState.isBucketCreated = false)], ,],
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+subscribeToEvents: [If (accelerometers != null),[nothingHere],],
+installed: [(atomicState.version = 1.1.0)], [(atomicState.isBucketCreated = false)], [(atomicState.grokerSubdomain = groker)], [nothingHere][(atomicState.isBucketCreated = false)], [(atomicState.grokerSubdomain = groker)], [log.debug(installed (version $atomicState.version))], 
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+updated: [(atomicState.version = 1.1.0)], [nothingHere][If ((atomicState.bucketKey != null) && (atomicState.accessKey != null)),[(atomicState.isBucketCreated = false)], ,],
+uninstalled: [log.debug(uninstalled (version $atomicState.version))], 
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+tryCreateBucket: [If ((atomicState.grokerSubdomain == null) || (atomicState.grokerSubdomain == )),[nothingHere],],
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+genericHandler: [nothingHere][nothingHere][If (evt.unit != null),[nothingHere],],
+eventHandler: [nothingHere][nothingHere][nothingHere][nothingHere]
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+tryShipEvents: [(grokerSubdomain = atomicState.grokerSubdomain)], [If ((grokerSubdomain == null) || (grokerSubdomain == )),[nothingHere],],
+IT HAS ATOMICSTATE
+req caps: [capability.battery, capability.colorcontrol, capability.alarm, capability.watersensor, capability.accelerationsensor, capability.sleepsensor, capability.thermostat, capability.relayswitch, capability.powermeter, capability.relativehumiditymeasurement, capability.doorcontrol, capability.motionsensor, capability.contactsensor, capability.valve, capability.energymeter, capability.switch, capability.carbonmonoxidedetector, capability.presencesensor, capability.temperaturemeasurement, capability.musicplayer, capability.illuminancemeasurement, capability.stepsensor, capability.switchlevel, capability.lock, capability.smokedetector, capability.beacon]
+req cap size: 26
+requested commands:[heat, play, auto, siren, nexttrack, restoretrack, resumetrack, sethue, setcolor, setcoolingsetpoint, lock, unmute, emergencyheat, fancirculate, close, on, setheatingsetpoint, setsaturation, unlock, cool, playtrack, setthermostatmode, mute, playtext, off, pause, both, settrack, previoustrack, setlevel, strobe, stop, fanon, setthermostatfanmode, open, fanauto]
+requested attrs:[door, color, thermostatoperatingstate, battery, carbonmonoxide, sleeping, switch, saturation, coolingsetpoint, acceleration, thermostatmode, contact, alarm, temperature, heatingsetpoint, humidity, lock, power, presence, energy, thermostatfanmode, goal, motion, level, smoke, trackdescription, mute, thermostatsetpoint, water, steps, trackdata, illuminance, hue, status]
+Methods below
+getaccesskey
+getbucketkey
+setbucketkey
+setaccesskey
+subscribetoevents
+installed
+updated
+uninstalled
+trycreatebucket
+generichandler
+eventhandler
+tryshipevents
+called cap-methods by app
+called cap-props by app
+color
+battery
+carbonmonoxide
+sleeping
+switch
+saturation
+coolingsetpoint
+acceleration
+thermostatmode
+contact
+alarm
+temperature
+heatingsetpoint
+humidity
+lock
+power
+presence
+energy
+thermostatfanmode
+goal
+motion
+level
+smoke
+trackdescription
+mute
+thermostatsetpoint
+water
+steps
+trackdata
+illuminance
+hue
+status
+attribute uses through subscriptions
+color
+thermostatoperatingstate
+battery
+carbonmonoxide
+sleeping
+switch
+saturation
+coolingsetpoint
+acceleration
+thermostatmode
+contact
+alarm
+temperature
+lock
+humidity
+heatingsetpoint
+power
+presence
+energy
+goal
+thermostatfanmode
+motion
+level
+smoke
+trackdescription
+mute
+thermostatsetpoint
+steps
+water
+trackdata
+illuminance
+hue
+status
+cmd overpriv:[heat, play, auto, siren, nexttrack, restoretrack, resumetrack, sethue, setcolor, setcoolingsetpoint, lock, unmute, emergencyheat, fancirculate, close, on, setheatingsetpoint, setsaturation, unlock, cool, playtrack, setthermostatmode, mute, playtext, off, pause, both, settrack, previoustrack, setlevel, strobe, stop, fanon, setthermostatfanmode, open, fanauto]
+attr overpriv:[door, thermostatoperatingstate]
+^^^^^^^^-OVERPRIVILEGED-^^^^^^^
