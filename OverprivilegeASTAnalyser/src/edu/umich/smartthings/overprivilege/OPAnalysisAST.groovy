@@ -130,12 +130,8 @@ class OPAnalysisAST extends CompilationCustomizer
 				methTree = makeTreeBranching(methTree, statements)
 				return methTree
 			}else if (statements.first().getClass() == org.codehaus.groovy.ast.stmt.ForStatement) {
-				//ADD CODE HERE
-				//Again recursively check for more statements
-				//Use picture at https://en.wikipedia.org/wiki/Abstract_syntax_tree to get idea how to format
-				methTree = methTree + "[For " + statements.first().getCollectionExpression().getText() + "]"
-				//methTree = methTree + makeTreeBranching("", statements) + ", "
-				//methTree = methTree + makeTreeBranching("", statements) + "]"
+				methTree = methTree + "[For " + statements.first().getCollectionExpression().getText() + ","
+				methTree = methTree + makeTreeBranching("", statements.first().getLoopBlock) + "]"
 				statements.removeAt(0)
 				methTree = methTree + makeTreeBranching(methTree, statements)
 				return methTree
@@ -201,6 +197,7 @@ class OPAnalysisAST extends CompilationCustomizer
 		//capabilities. These unused capabilities come from the device
 		//handlers that implement multiple capabilities
 		computeType2Overprivilege(insnVis, declaredMethods)
+		println "where am i crashing 3"
 	}
 	
 	class MethodCodeVisitor extends ClassCodeVisitorSupport
@@ -1097,7 +1094,6 @@ class OPAnalysisAST extends CompilationCustomizer
 		def hdrCaps = allUniqueCombs[0]
 		allUniqueCombs.remove(0)
 		
-		println "done computing combinations"
 		
 		//figure out what the app uses
 		def calledCmdAttr = getCalledMethodsProps(insnVis)
@@ -1117,7 +1113,6 @@ class OPAnalysisAST extends CompilationCustomizer
 			auc.each { aDevice ->
 				univOfCapsAtThisPoint.addAll(dev2cap[aDevice])
 			}
-			
 			//println "For combination, " + Arrays.toString(auc)
 			def allUniqueCapsAtPoint = univOfCapsAtThisPoint.toSet()
 			
@@ -1147,14 +1142,13 @@ class OPAnalysisAST extends CompilationCustomizer
 					//the app is using some cmd or attr
 				}
 			}
-			
 			//at this point, type2OverprivCaps contains unused caps
 			//for this particular combination
 			SimpleContainer sc = new SimpleContainer(auc, type2OverprivCaps)
 			comb2overpriv.add(sc)
 			
 		}
-		
+		println "where am i crashing 1"
 		//now select the minimum amount of extraneous caps
 		//and report that as the type 2 overprivilege for this app
 		
@@ -1176,7 +1170,7 @@ class OPAnalysisAST extends CompilationCustomizer
 			
 			type2_numCaps += 1
 		}
-		
+		println "where am i crashing 2"
 		//part 2: compute whether the app is using any type 2 cmd/attributes
 		//we want to compute the set of ALL cmds/attrs possible for this
 		//particular app using the set of devicehandlers that we have
