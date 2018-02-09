@@ -12,6 +12,7 @@ package edu.umich.smartthings.overprivilege
 import org.codehaus.groovy.ast.ClassCodeVisitorSupport
 import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.ast.MethodNode
+import org.codehaus.groovy.ast.*
 import org.codehaus.groovy.ast.expr.BinaryExpression
 import org.codehaus.groovy.ast.expr.ConstantExpression
 import org.codehaus.groovy.ast.expr.DeclarationExpression
@@ -22,12 +23,17 @@ import org.codehaus.groovy.ast.expr.NamedArgumentListExpression
 import org.codehaus.groovy.ast.expr.PropertyExpression
 import org.codehaus.groovy.ast.expr.TupleExpression
 import org.codehaus.groovy.ast.expr.VariableExpression
+import org.codehaus.groovy.ast.stmt.BlockStatement
+import org.codehaus.groovy.ast.stmt.IfStatement
+import org.codehaus.groovy.ast.stmt.Statement
+import org.codehaus.groovy.ast.Parameter
 import org.codehaus.groovy.classgen.GeneratorContext
 import org.codehaus.groovy.control.CompilePhase
 import org.codehaus.groovy.control.SourceUnit
 import org.codehaus.groovy.control.customizers.CompilationCustomizer
 import org.codehaus.groovy.transform.GroovyASTTransformation
 import org.codehause.groovyx.gpars.*
+
 
 @GroovyASTTransformation(phase = CompilePhase.SEMANTIC_ANALYSIS)
 class OPAnalysisAST extends CompilationCustomizer
@@ -54,6 +60,9 @@ class OPAnalysisAST extends CompilationCustomizer
 	int numSendSms
 	int numOAuth
 	int numInternet
+	
+	//more stuff 0 for no state or atomicState, 1 for State, 2 for Atomic State
+	int stateHolder = 0
 	
 	Logger log
 	
@@ -87,7 +96,52 @@ class OPAnalysisAST extends CompilationCustomizer
 		
 		log = logger
 	}
-	
+	public String makeTreeBranching(String methTree, List<Statement> statements) {
+		if (!statements.isEmpty()) { 
+			if (statements.first() instanceof BlockStatement) {
+				List<Statement> states = (List<Statement>) ((BlockStatement) statements.first()).getStatements()
+				methTree = makeTreeBranching(methTree, states)
+			}else if (statements.first().getClass() == org.codehaus.groovy.ast.stmt.ExpressionStatement) {
+				//ADD CODE HERE
+				//add for attribute change or local var change
+				if (statements.first().getText().contains("atomicState.") ) {
+					stateHolder = 2
+					methTree = methTree + "[" + statements.first().getText() + "], "
+				}else if (statements.first().getText().contains("state.") ) {
+					stateHolder = 1
+					methTree = methTree + "[" + statements.first().getText() + "], "
+				//}else if (statements.first().getText().contains("state.") ) {
+				//	stateHolder = 1
+				//	methTree = methTree + "[" + statements.first().getText() + "], "
+				} else
+					methTree = methTree + "[nothingHere]"
+				statements.removeAt(0)
+				methTree = makeTreeBranching(methTree, statements)
+				return methTree
+			}else if (statements.first().getClass() == org.codehaus.groovy.ast.stmt.IfStatement) {
+				def ifStatementCopy = statements.first()
+				methTree = methTree + "[If " + statements.first().getBooleanExpression().getText() + ","
+				statements.add(0, ifStatementCopy.getIfBlock()) 
+				println statements.getClass()
+				methTree = methTree + makeTreeBranching("", statements) + ","
+				statements.add(0, ifStatementCopy.getElseBlock()) 
+				methTree = methTree + makeTreeBranching("",statements) + "],"
+				statements.removeAt(0)
+				methTree = makeTreeBranching(methTree, statements)
+				return methTree
+			}else if (statements.first().getClass() == org.codehaus.groovy.ast.stmt.ForStatement) {
+				methTree = methTree + "[For " + statements.first().getCollectionExpression().getText() + ","
+				methTree = methTree + makeTreeBranching("", statements.first().getLoopBlock) + "]"
+				statements.removeAt(0)
+				methTree = methTree + makeTreeBranching(methTree, statements)
+				return methTree
+			}else {
+				log.append("no code yet for class" + statements.first().getClass())
+				return methTree
+			}
+		}else
+			return methTree
+	}
 	@Override
 	void call(SourceUnit source, GeneratorContext context, ClassNode classNode) {
 		
@@ -101,15 +155,43 @@ class OPAnalysisAST extends CompilationCustomizer
 		classNode.visitContents(insnVis)
 		
 		def allMethodNodes = classNode.getAllDeclaredMethods()
+		def afterMain = false
+		def methTree = ""
+		println "DECLARED METHODS"
+		log.append("DECLARED METHODS")
+		for (MethodNode meth : allMethodNodes){
+			methTree = ""
+			if (meth.getName() == "main")
+				afterMain = true
+			else if (afterMain == true && meth.getName() != "") {
+				methTree = meth.getName() + ": "
+				//ADD CODE
+				//above add parameters into methods
+				println methTree
+				if (meth.getCode() instanceof BlockStatement) {
+					List<Statement> statements = (List<Statement>) ((BlockStatement) meth.getCode()).getStatements()
+					methTree = makeTreeBranching(methTree, statements)
+					log.append(methTree)
+
+				}
+			}
+		}
+		if (stateHolder == 1)
+			log.append("IT HAS STATE")
+		else if (stateHolder == 2)
+			log.append("IT HAS ATOMICSTATE")
+			//println state.getText()
 		def allFieldNodes = classNode.getFields()
-		
+		println "FIELDS"
+		for (String field : allFieldNodes){
+			println field
+		}
 		ArrayList<String> declaredMethods = new ArrayList<String>()
 		allMethodNodes.each { it -> declaredMethods.add(it.getName().toLowerCase()) }
 				
 		//to compute declared fields, you must inspect the run() method
 		//injected by the groovy compiler
-		
-		processApp(insnVis, declaredMethods)
+        processApp(insnVis, declaredMethods)
 		
 		//compute type 2 overprivilege as the number of unused
 		//capabilities. These unused capabilities come from the device
@@ -128,6 +210,7 @@ class OPAnalysisAST extends CompilationCustomizer
 			globals = new ArrayList<String>()
 			dexpressions = new ArrayList<DeclarationExpression>()
 			bexpressions = new ArrayList<BinaryExpression>()
+			
 		}
 		
 		@Override
@@ -204,7 +287,8 @@ class OPAnalysisAST extends CompilationCustomizer
 		{
 			//println mce.getMethodAsString()
 			def methText
-				
+			//trying to get full method path as tree structure
+			//def methPath
 			
 			if(mce.getMethodAsString() == null)
 			{
@@ -216,8 +300,11 @@ class OPAnalysisAST extends CompilationCustomizer
 				methText = mce.getMethodAsString()
 			}
 			
+			//println methText
+			
 			//determine the receiver of the method call
 			def recver = mce.getReceiver()
+			//println "this is the Reciever for " + methText + ": " + recver.getText()
 			if(recver instanceof VariableExpression)
 			{
 				VariableExpression recvex = (VariableExpression) recver
@@ -565,7 +652,7 @@ class OPAnalysisAST extends CompilationCustomizer
 				//subscription? I don't know. So I'm marking this for manual
 				//analysis
 				log.append "subscribeToCommand"
-				OPAnalysisAST.this.append_manual()
+				//OPAnalysisAST.append_manual()
 			}
 			
 			if(methText.equals("subscribe"))
@@ -611,12 +698,12 @@ class OPAnalysisAST extends CompilationCustomizer
 						else
 						{
 							log.append "subscribe: not a ConstantExpression!"
-							OPAnalysisAST.this.append_manual()
+							//OPAnalysisAST.append_manual()
 							
 							if(! (args[0] instanceof VariableExpression))
 							{
 								log.append "subscribe: first arg not a VariableExpression"
-								OPAnalysisAST.this.append_manual()
+								//OPAnalysisAST.append_manual()
 							}
 						}
 					}
@@ -671,7 +758,7 @@ class OPAnalysisAST extends CompilationCustomizer
 					else
 					{
 						log.append mce.getMethodAsString() + ", arg not ConstantExpression"
-						OPAnalysisAST.this.append_manual()
+						//OPAnalysisAST.append_manual()
 					}
 				}
 			}
@@ -692,7 +779,7 @@ class OPAnalysisAST extends CompilationCustomizer
 					else
 					{
 						log.append mce.getMethodAsString() + ", arg not ConstantExpression"
-						OPAnalysisAST.this.append_manual()
+						//OPAnalysisAST.append_manual()
 					}
 				}
 			}
@@ -712,7 +799,7 @@ class OPAnalysisAST extends CompilationCustomizer
 				else
 				{
 					log.append mce.getMethodAsString() + ", arg not ConstantExpression"
-					OPAnalysisAST.this.append_manual()
+					//OPAnalysisAST.append_manual()
 				}
 			}
 			
@@ -735,7 +822,7 @@ class OPAnalysisAST extends CompilationCustomizer
 				//device in the first place. therefore, we do not
 				//count it as overprivilege.
 				//log.append("addChildDevice usage")
-				//OPAnalysisAST.this.append_manual()
+				//OPAnalysisAST.append_manual()
 				usesAddChildDevice = true
 			}
 			
@@ -1006,7 +1093,6 @@ class OPAnalysisAST extends CompilationCustomizer
 		def hdrCaps = allUniqueCombs[0]
 		allUniqueCombs.remove(0)
 		
-		println "done computing combinations"
 		
 		//figure out what the app uses
 		def calledCmdAttr = getCalledMethodsProps(insnVis)
@@ -1026,7 +1112,6 @@ class OPAnalysisAST extends CompilationCustomizer
 			auc.each { aDevice ->
 				univOfCapsAtThisPoint.addAll(dev2cap[aDevice])
 			}
-			
 			//println "For combination, " + Arrays.toString(auc)
 			def allUniqueCapsAtPoint = univOfCapsAtThisPoint.toSet()
 			
@@ -1056,14 +1141,12 @@ class OPAnalysisAST extends CompilationCustomizer
 					//the app is using some cmd or attr
 				}
 			}
-			
 			//at this point, type2OverprivCaps contains unused caps
 			//for this particular combination
 			SimpleContainer sc = new SimpleContainer(auc, type2OverprivCaps)
 			comb2overpriv.add(sc)
 			
 		}
-		
 		//now select the minimum amount of extraneous caps
 		//and report that as the type 2 overprivilege for this app
 		
@@ -1085,7 +1168,6 @@ class OPAnalysisAST extends CompilationCustomizer
 			
 			type2_numCaps += 1
 		}
-		
 		//part 2: compute whether the app is using any type 2 cmd/attributes
 		//we want to compute the set of ALL cmds/attrs possible for this
 		//particular app using the set of devicehandlers that we have
@@ -1167,6 +1249,7 @@ class OPAnalysisAST extends CompilationCustomizer
 		
 		def reqCaps = insnVis.requestedCaps.intersect(allCapsList)
 		def declaredGlobals = insnVis.declaredGlobalVars
+		def afterMain = false
 								
 		log.append "req caps: " + reqCaps.toSet()
 		log.append "req cap size: " + reqCaps.size()
@@ -1181,13 +1264,27 @@ class OPAnalysisAST extends CompilationCustomizer
 		//this means that the app asks for no capabilities at all
 		if(reqCmds.toList().size() == 0 && reqAttrs.toList().size() == 0)
 			return
-			
-		
+
+		for (DeclarationExpression dex : insnVis.alldexprs){
+			println dex.getText()
+		}
+		println "^dex \\/bex"
+		for (BinaryExpression bex : insnVis.allbexprs){
+			println bex.getText()
+		}
+		log.append "Methods below"
+		for (String attr : declaredMethods){
+			if(attr == "main") 
+				afterMain = true
+			else if (afterMain == true)
+				log.append attr
+		}
+				
 		def reflIndex = calledMethods?.toList().any { v -> v?.contains("\$") }
 		if(reflIndex)
 		{
 			log.append "Dynamic Method Invocation"
-			OPAnalysisAST.append_manual()
+			//OPAnalysisAST.append_manual()
 			numReflection += 1
 		}
 				
@@ -1209,7 +1306,7 @@ class OPAnalysisAST extends CompilationCustomizer
 		if(sameNameCommands.size() > 0 && (reqCmds.toList().size() > 0 || reqAttrs.toList().size() > 0))
 		{
 			log.append "Some app-defined methods have the same name as known IoT commands:"
-			OPAnalysisAST.append_manual()
+			//OPAnalysisAST.append_manual()
 			sameNameCommands.each { it -> log.append it }
 		}
 			
@@ -1218,7 +1315,7 @@ class OPAnalysisAST extends CompilationCustomizer
 		if(sameNameAttrs.size() > 0 && (reqCmds.toList().size() > 0 || reqAttrs.toList().size() > 0))
 		{
 			log.append "Some app-defined globally-scoped properites have the same name as known IoT attributes:"
-			OPAnalysisAST.append_manual()
+			//OPAnalysisAST.append_manual()
 			sameNameAttrs.each { it -> log.append it }
 		}
 		
@@ -1249,7 +1346,7 @@ class OPAnalysisAST extends CompilationCustomizer
 		if(insnVis.usesAddChildDevice)
 		{
 			log.append "addChildDevice usage"
-			OPAnalysisAST.append_manual()
+			//OPAnalysisAST.append_manual()
 		}
 		
 		if (type2Uses_Cmds.toList().size() > 0)

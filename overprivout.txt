@@ -1,0 +1,448 @@
+
+--app-start--
+processing acceleration-sensor-capability.groovy
+DECLARED METHODS
+parse: [nothingHere][nothingHere]
+req caps: []
+req cap size: 0
+requested commands:[]
+requested attrs:[]
+missing method: groovy.lang.MissingMethodException: No signature of method: acceleration-sensor-capability.metadata() is applicable for argument types: (acceleration-sensor-capability$_run_closure1) values: [acceleration-sensor-capability$_run_closure1@ffaa6af]
+Possible solutions: metaClass(groovy.lang.Closure)
+--app-start--
+processing aeon-home-energy-meter-c3.groovy
+--app-start--
+processing acceleration-sensor-capability.groovy
+DECLARED METHODS
+parse: [nothingHere][nothingHere]
+req caps: []
+req cap size: 0
+requested commands:[]
+requested attrs:[]
+missing method: groovy.lang.MissingMethodException: No signature of method: acceleration-sensor-capability.metadata() is applicable for argument types: (acceleration-sensor-capability$_run_closure1) values: [acceleration-sensor-capability$_run_closure1@ffaa6af]
+Possible solutions: metaClass(groovy.lang.Closure)
+--app-start--
+processing alarm-capability.groovy
+DECLARED METHODS
+strobe: [nothingHere]
+siren: [nothingHere]
+both: [nothingHere]
+off: [nothingHere]
+parse: [nothingHere][nothingHere]
+req caps: []
+req cap size: 0
+requested commands:[]
+requested attrs:[]
+missing method: groovy.lang.MissingMethodException: No signature of method: alarm-capability.metadata() is applicable for argument types: (alarm-capability$_run_closure1) values: [alarm-capability$_run_closure1@71a8adcf]
+Possible solutions: metaClass(groovy.lang.Closure)
+--app-start--
+processing alfred-workflow.groovy
+currentState, arg not ConstantExpression
+currentState, arg not ConstantExpression
+DECLARED METHODS
+installed: 
+updated: 
+listSwitches: [nothingHere]
+updateSwitches: [nothingHere]
+showSwitch: [nothingHere]
+updateSwitch: [nothingHere]
+listLocks: [nothingHere]
+updateLocks: [nothingHere]
+showLock: [nothingHere]
+updateLock: [nothingHere]
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+updateAll: [nothingHere][nothingHere][If devices,[nothingHere],],
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+update: [nothingHere][nothingHere][nothingHere][nothingHere][If device,[nothingHere],],
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+validateCommand: [nothingHere][nothingHere][If capabilityCommands[currentDeviceCapability],,[nothingHere]],
+no code yet for classclass org.codehaus.groovy.ast.stmt.SwitchStatement
+getCapabilityName: 
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+getDeviceCapabilityCommands: [nothingHere][nothingHere]
+executeCommand: [If this.validateCommand(device, type, command),[nothingHere],[nothingHere]],
+show: [nothingHere][If device,[nothingHere],[nothingHere][nothingHere]],
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+device: [If it,[nothingHere][nothingHere],],
+req caps: [capability.lock, capability.switch]
+req cap size: 2
+requested commands:[lock, unlock, off, on]
+requested attrs:[lock, switch]
+Methods below
+installed
+updated
+listswitches
+updateswitches
+showswitch
+updateswitch
+listlocks
+updatelocks
+showlock
+updatelock
+updateall
+update
+validatecommand
+getcapabilityname
+getdevicecapabilitycommands
+executecommand
+show
+device
+Dynamic Method Invocation
+called cap-methods by app
+called cap-props by app
+attribute uses through subscriptions
+cmd overpriv:[lock, unlock, off, on]
+attr overpriv:[lock, switch]
+^^^^^^^^-OVERPRIVILEGED-^^^^^^^
+type2 overprivilege unused caps:
+type2 driver combination: [8a9d4b1e3b8af959013b8af9d183000e, bdefadfd-d59f-4d54-82c2-5fbb3ac6965f]
+[[capability.battery, capability.switch, capability.polling, capability.lock, capability.refresh]]
+--app-start--
+processing acceleration-sensor-capability.groovy
+DECLARED METHODS
+parse: [nothingHere][nothingHere]
+req caps: []
+req cap size: 0
+requested commands:[]
+requested attrs:[]
+missing method: groovy.lang.MissingMethodException: No signature of method: acceleration-sensor-capability.metadata() is applicable for argument types: (acceleration-sensor-capability$_run_closure1) values: [acceleration-sensor-capability$_run_closure1@ffaa6af]
+Possible solutions: metaClass(groovy.lang.Closure)
+--app-start--
+processing alarm-capability.groovy
+DECLARED METHODS
+strobe: [nothingHere]
+siren: [nothingHere]
+both: [nothingHere]
+off: [nothingHere]
+parse: [nothingHere][nothingHere]
+req caps: []
+req cap size: 0
+requested commands:[]
+requested attrs:[]
+missing method: groovy.lang.MissingMethodException: No signature of method: alarm-capability.metadata() is applicable for argument types: (alarm-capability$_run_closure1) values: [alarm-capability$_run_closure1@71a8adcf]
+Possible solutions: metaClass(groovy.lang.Closure)
+--app-start--
+processing alfred-workflow.groovy
+currentState, arg not ConstantExpression
+currentState, arg not ConstantExpression
+DECLARED METHODS
+installed: 
+updated: 
+listSwitches: [nothingHere]
+updateSwitches: [nothingHere]
+showSwitch: [nothingHere]
+updateSwitch: [nothingHere]
+listLocks: [nothingHere]
+updateLocks: [nothingHere]
+showLock: [nothingHere]
+updateLock: [nothingHere]
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+updateAll: [nothingHere][nothingHere][If devices,[nothingHere],],
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+update: [nothingHere][nothingHere][nothingHere][nothingHere][If device,[nothingHere],],
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+validateCommand: [nothingHere][nothingHere][If capabilityCommands[currentDeviceCapability],,[nothingHere]],
+no code yet for classclass org.codehaus.groovy.ast.stmt.SwitchStatement
+getCapabilityName: 
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+getDeviceCapabilityCommands: [nothingHere][nothingHere]
+executeCommand: [If this.validateCommand(device, type, command),[nothingHere],[nothingHere]],
+show: [nothingHere][If device,[nothingHere],[nothingHere][nothingHere]],
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+device: [If it,[nothingHere][nothingHere],],
+req caps: [capability.lock, capability.switch]
+req cap size: 2
+requested commands:[lock, unlock, off, on]
+requested attrs:[lock, switch]
+Methods below
+installed
+updated
+listswitches
+updateswitches
+showswitch
+updateswitch
+listlocks
+updatelocks
+showlock
+updatelock
+updateall
+update
+validatecommand
+getcapabilityname
+getdevicecapabilitycommands
+executecommand
+show
+device
+Dynamic Method Invocation
+called cap-methods by app
+called cap-props by app
+attribute uses through subscriptions
+cmd overpriv:[lock, unlock, off, on]
+attr overpriv:[lock, switch]
+^^^^^^^^-OVERPRIVILEGED-^^^^^^^
+type2 overprivilege unused caps:
+type2 driver combination: [8a9d4b1e3b8af959013b8af9d183000e, bdefadfd-d59f-4d54-82c2-5fbb3ac6965f]
+[[capability.battery, capability.switch, capability.polling, capability.lock, capability.refresh]]
+--app-start--
+processing acceleration-sensor-capability.groovy
+DECLARED METHODS
+parse: [nothingHere][nothingHere]
+req caps: []
+req cap size: 0
+requested commands:[]
+requested attrs:[]
+missing method: groovy.lang.MissingMethodException: No signature of method: acceleration-sensor-capability.metadata() is applicable for argument types: (acceleration-sensor-capability$_run_closure1) values: [acceleration-sensor-capability$_run_closure1@ffaa6af]
+Possible solutions: metaClass(groovy.lang.Closure)
+--app-start--
+processing alarm-capability.groovy
+DECLARED METHODS
+strobe: [nothingHere]
+siren: [nothingHere]
+both: [nothingHere]
+off: [nothingHere]
+parse: [nothingHere][nothingHere]
+req caps: []
+req cap size: 0
+requested commands:[]
+requested attrs:[]
+missing method: groovy.lang.MissingMethodException: No signature of method: alarm-capability.metadata() is applicable for argument types: (alarm-capability$_run_closure1) values: [alarm-capability$_run_closure1@71a8adcf]
+Possible solutions: metaClass(groovy.lang.Closure)
+--app-start--
+processing alfred-workflow.groovy
+currentState, arg not ConstantExpression
+currentState, arg not ConstantExpression
+DECLARED METHODS
+installed: 
+updated: 
+listSwitches: [nothingHere]
+updateSwitches: [nothingHere]
+showSwitch: [nothingHere]
+updateSwitch: [nothingHere]
+listLocks: [nothingHere]
+updateLocks: [nothingHere]
+showLock: [nothingHere]
+updateLock: [nothingHere]
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+updateAll: [nothingHere][nothingHere][If devices,[nothingHere],],
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+update: [nothingHere][nothingHere][nothingHere][nothingHere][If device,[nothingHere],],
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+validateCommand: [nothingHere][nothingHere][If capabilityCommands[currentDeviceCapability],,[nothingHere]],
+no code yet for classclass org.codehaus.groovy.ast.stmt.SwitchStatement
+getCapabilityName: 
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+getDeviceCapabilityCommands: [nothingHere][nothingHere]
+executeCommand: [If this.validateCommand(device, type, command),[nothingHere],[nothingHere]],
+show: [nothingHere][If device,[nothingHere],[nothingHere][nothingHere]],
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+device: [If it,[nothingHere][nothingHere],],
+req caps: [capability.lock, capability.switch]
+req cap size: 2
+requested commands:[lock, unlock, off, on]
+requested attrs:[lock, switch]
+Methods below
+installed
+updated
+listswitches
+updateswitches
+showswitch
+updateswitch
+listlocks
+updatelocks
+showlock
+updatelock
+updateall
+update
+validatecommand
+getcapabilityname
+getdevicecapabilitycommands
+executecommand
+show
+device
+Dynamic Method Invocation
+called cap-methods by app
+called cap-props by app
+attribute uses through subscriptions
+cmd overpriv:[lock, unlock, off, on]
+attr overpriv:[lock, switch]
+^^^^^^^^-OVERPRIVILEGED-^^^^^^^
+type2 overprivilege unused caps:
+type2 driver combination: [8a9d4b1e3b8af959013b8af9d183000e, bdefadfd-d59f-4d54-82c2-5fbb3ac6965f]
+[[capability.battery, capability.switch, capability.polling, capability.lock, capability.refresh]]
+--app-start--
+processing acceleration-sensor-capability.groovy
+DECLARED METHODS
+parse: [nothingHere][nothingHere]
+req caps: []
+req cap size: 0
+requested commands:[]
+requested attrs:[]
+missing method: groovy.lang.MissingMethodException: No signature of method: acceleration-sensor-capability.metadata() is applicable for argument types: (acceleration-sensor-capability$_run_closure1) values: [acceleration-sensor-capability$_run_closure1@ffaa6af]
+Possible solutions: metaClass(groovy.lang.Closure)
+--app-start--
+processing alarm-capability.groovy
+DECLARED METHODS
+strobe: [nothingHere]
+siren: [nothingHere]
+both: [nothingHere]
+off: [nothingHere]
+parse: [nothingHere][nothingHere]
+req caps: []
+req cap size: 0
+requested commands:[]
+requested attrs:[]
+missing method: groovy.lang.MissingMethodException: No signature of method: alarm-capability.metadata() is applicable for argument types: (alarm-capability$_run_closure1) values: [alarm-capability$_run_closure1@71a8adcf]
+Possible solutions: metaClass(groovy.lang.Closure)
+--app-start--
+processing alfred-workflow.groovy
+currentState, arg not ConstantExpression
+currentState, arg not ConstantExpression
+DECLARED METHODS
+installed: 
+updated: 
+listSwitches: [nothingHere]
+updateSwitches: [nothingHere]
+showSwitch: [nothingHere]
+updateSwitch: [nothingHere]
+listLocks: [nothingHere]
+updateLocks: [nothingHere]
+showLock: [nothingHere]
+updateLock: [nothingHere]
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+updateAll: [nothingHere][nothingHere][If devices,[nothingHere],],
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+update: [nothingHere][nothingHere][nothingHere][nothingHere][If device,[nothingHere],],
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+validateCommand: [nothingHere][nothingHere][If capabilityCommands[currentDeviceCapability],,[nothingHere]],
+no code yet for classclass org.codehaus.groovy.ast.stmt.SwitchStatement
+getCapabilityName: 
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+getDeviceCapabilityCommands: [nothingHere][nothingHere]
+executeCommand: [If this.validateCommand(device, type, command),[nothingHere],[nothingHere]],
+show: [nothingHere][If device,[nothingHere],[nothingHere][nothingHere]],
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+device: [If it,[nothingHere][nothingHere],],
+req caps: [capability.lock, capability.switch]
+req cap size: 2
+requested commands:[lock, unlock, off, on]
+requested attrs:[lock, switch]
+Methods below
+installed
+updated
+listswitches
+updateswitches
+showswitch
+updateswitch
+listlocks
+updatelocks
+showlock
+updatelock
+updateall
+update
+validatecommand
+getcapabilityname
+getdevicecapabilitycommands
+executecommand
+show
+device
+Dynamic Method Invocation
+called cap-methods by app
+called cap-props by app
+attribute uses through subscriptions
+cmd overpriv:[lock, unlock, off, on]
+attr overpriv:[lock, switch]
+^^^^^^^^-OVERPRIVILEGED-^^^^^^^
+type2 overprivilege unused caps:
+type2 driver combination: [8a9d4b1e3b8af959013b8af9d183000e, bdefadfd-d59f-4d54-82c2-5fbb3ac6965f]
+[[capability.battery, capability.switch, capability.polling, capability.lock, capability.refresh]]
+--app-start--
+processing acceleration-sensor-capability.groovy
+DECLARED METHODS
+parse: [nothingHere][nothingHere]
+req caps: []
+req cap size: 0
+requested commands:[]
+requested attrs:[]
+missing method: groovy.lang.MissingMethodException: No signature of method: acceleration-sensor-capability.metadata() is applicable for argument types: (acceleration-sensor-capability$_run_closure1) values: [acceleration-sensor-capability$_run_closure1@ffaa6af]
+Possible solutions: metaClass(groovy.lang.Closure)
+--app-start--
+processing alarm-capability.groovy
+DECLARED METHODS
+strobe: [nothingHere]
+siren: [nothingHere]
+both: [nothingHere]
+off: [nothingHere]
+parse: [nothingHere][nothingHere]
+req caps: []
+req cap size: 0
+requested commands:[]
+requested attrs:[]
+missing method: groovy.lang.MissingMethodException: No signature of method: alarm-capability.metadata() is applicable for argument types: (alarm-capability$_run_closure1) values: [alarm-capability$_run_closure1@71a8adcf]
+Possible solutions: metaClass(groovy.lang.Closure)
+--app-start--
+processing alfred-workflow.groovy
+currentState, arg not ConstantExpression
+currentState, arg not ConstantExpression
+DECLARED METHODS
+installed: 
+updated: 
+listSwitches: [nothingHere]
+updateSwitches: [nothingHere]
+showSwitch: [nothingHere]
+updateSwitch: [nothingHere]
+listLocks: [nothingHere]
+updateLocks: [nothingHere]
+showLock: [nothingHere]
+updateLock: [nothingHere]
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+updateAll: [nothingHere][nothingHere][If devices,[nothingHere],],
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+update: [nothingHere][nothingHere][nothingHere][nothingHere][If device,[nothingHere],],
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+validateCommand: [nothingHere][nothingHere][If capabilityCommands[currentDeviceCapability],,[nothingHere]],
+no code yet for classclass org.codehaus.groovy.ast.stmt.SwitchStatement
+getCapabilityName: 
+no code yet for classclass org.codehaus.groovy.ast.stmt.ReturnStatement
+getDeviceCapabilityCommands: [nothingHere][nothingHere]
+executeCommand: [If this.validateCommand(device, type, command),[nothingHere],[nothingHere]],
+show: [nothingHere][If device,[nothingHere],[nothingHere][nothingHere]],
+no code yet for classclass org.codehaus.groovy.ast.stmt.EmptyStatement
+device: [If it,[nothingHere][nothingHere],],
+req caps: [capability.lock, capability.switch]
+req cap size: 2
+requested commands:[lock, unlock, off, on]
+requested attrs:[lock, switch]
+Methods below
+installed
+updated
+listswitches
+updateswitches
+showswitch
+updateswitch
+listlocks
+updatelocks
+showlock
+updatelock
+updateall
+update
+validatecommand
+getcapabilityname
+getdevicecapabilitycommands
+executecommand
+show
+device
+Dynamic Method Invocation
+called cap-methods by app
+called cap-props by app
+attribute uses through subscriptions
+cmd overpriv:[lock, unlock, off, on]
+attr overpriv:[lock, switch]
+^^^^^^^^-OVERPRIVILEGED-^^^^^^^
+type2 overprivilege unused caps:
+type2 driver combination: [8a9d4b1e3b8af959013b8af9d183000e, bdefadfd-d59f-4d54-82c2-5fbb3ac6965f]
+[[capability.battery, capability.switch, capability.polling, capability.lock, capability.refresh]]
