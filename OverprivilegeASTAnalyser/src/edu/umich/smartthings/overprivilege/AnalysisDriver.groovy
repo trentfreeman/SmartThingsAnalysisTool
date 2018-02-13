@@ -118,5 +118,6 @@ class AnalysisDriver
 		//sop.loadCapRef(allCaps)
 		//sop.processApp(file)
 		//sop.processAllApps("D:\\SamsungSmartApps\\dump_ast")
+		println "FINISHED"
 	}
 }

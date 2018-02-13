@@ -14,6 +14,7 @@ import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.ast.MethodNode
 import org.codehaus.groovy.ast.*
 import org.codehaus.groovy.ast.expr.BinaryExpression
+import org.codehaus.groovy.ast.expr.ClosureExpression
 import org.codehaus.groovy.ast.expr.ConstantExpression
 import org.codehaus.groovy.ast.expr.DeclarationExpression
 import org.codehaus.groovy.ast.expr.Expression
@@ -24,8 +25,14 @@ import org.codehaus.groovy.ast.expr.PropertyExpression
 import org.codehaus.groovy.ast.expr.TupleExpression
 import org.codehaus.groovy.ast.expr.VariableExpression
 import org.codehaus.groovy.ast.stmt.BlockStatement
+import org.codehaus.groovy.ast.stmt.BreakStatement
+import org.codehaus.groovy.ast.stmt.EmptyStatement
+import org.codehaus.groovy.ast.stmt.ExpressionStatement
+import org.codehaus.groovy.ast.stmt.ForStatement
 import org.codehaus.groovy.ast.stmt.IfStatement
+import org.codehaus.groovy.ast.stmt.ReturnStatement
 import org.codehaus.groovy.ast.stmt.Statement
+import org.codehaus.groovy.ast.stmt.WhileStatement
 import org.codehaus.groovy.ast.Parameter
 import org.codehaus.groovy.classgen.GeneratorContext
 import org.codehaus.groovy.control.CompilePhase
@@ -48,6 +55,8 @@ class OPAnalysisAST extends CompilationCustomizer
 	List allCommandsList
 	List allPropsList
 	List allCapsList
+	List allStarts
+	List txtStarts
 	
 	int numCmdOverpriv
 	int numAttrOverpriv
@@ -79,6 +88,8 @@ class OPAnalysisAST extends CompilationCustomizer
 		allCommandsList = new ArrayList()
 		allPropsList = new ArrayList()
 		allCapsList = new ArrayList()
+		allStarts = new ArrayList()
+		txtStarts = new ArrayList()
 		
 		numCmdOverpriv = 0
 		numAttrOverpriv = 0
@@ -98,45 +109,50 @@ class OPAnalysisAST extends CompilationCustomizer
 	}
 	public String makeTreeBranching(String methTree, List<Statement> statements) {
 		if (!statements.isEmpty()) { 
-			if (statements.first() instanceof BlockStatement) {
-				List<Statement> states = (List<Statement>) ((BlockStatement) statements.first()).getStatements()
+			def state = statements.first()
+			if (state instanceof BlockStatement) {
+				List<Statement> states = (List<Statement>) ((BlockStatement) state).getStatements()
 				methTree = makeTreeBranching(methTree, states)
-			}else if (statements.first().getClass() == org.codehaus.groovy.ast.stmt.ExpressionStatement) {
-				//ADD CODE HERE
-				//add for attribute change or local var change
-				if (statements.first().getText().contains("atomicState.") ) {
+			}else if (state instanceof ExpressionStatement || state instanceof ReturnStatement) {
+				if (state.getText().contains("atomicState.") ) {
 					stateHolder = 2
-					methTree = methTree + "[" + statements.first().getText() + "], "
-				}else if (statements.first().getText().contains("state.") ) {
+					methTree = methTree + "[" + state.getText() + "]"
+				}else if (state.getText().contains("state.") ) {
 					stateHolder = 1
-					methTree = methTree + "[" + statements.first().getText() + "], "
-				//}else if (statements.first().getText().contains("state.") ) {
-				//	stateHolder = 1
-				//	methTree = methTree + "[" + statements.first().getText() + "], "
-				} else
-					methTree = methTree + "[nothingHere]"
+					methTree = methTree + "[" + state.getText() + "]"
+				}else if (state.getText().contains("=")){
+					methTree = methTree + "[" + state.getText() + "]"
+				}else if (txtStarts.findAll{state.getText().toLowerCase().contains(it.toLowerCase())}.any{true}) {
+					allStarts.add(state.getText())
+					methTree = methTree + "[" + state.getText() + "]"
+				}
 				statements.removeAt(0)
 				methTree = makeTreeBranching(methTree, statements)
 				return methTree
-			}else if (statements.first().getClass() == org.codehaus.groovy.ast.stmt.IfStatement) {
-				def ifStatementCopy = statements.first()
-				methTree = methTree + "[If " + statements.first().getBooleanExpression().getText() + ","
-				statements.add(0, ifStatementCopy.getIfBlock()) 
-				println statements.getClass()
-				methTree = methTree + makeTreeBranching("", statements) + ","
-				statements.add(0, ifStatementCopy.getElseBlock()) 
-				methTree = methTree + makeTreeBranching("",statements) + "],"
+			}else if (state instanceof IfStatement) {
+				def ifStatementCopy = state
+				methTree = methTree + "[If " + state.getBooleanExpression().getText() + ","
+				methTree = methTree + makeTreeBranching("", [ifStatementCopy.getIfBlock()]) + ","
+				methTree = methTree + makeTreeBranching("", [ifStatementCopy.getElseBlock()]) + "],"
 				statements.removeAt(0)
 				methTree = makeTreeBranching(methTree, statements)
 				return methTree
-			}else if (statements.first().getClass() == org.codehaus.groovy.ast.stmt.ForStatement) {
-				methTree = methTree + "[For " + statements.first().getCollectionExpression().getText() + ","
-				methTree = methTree + makeTreeBranching("", statements.first().getLoopBlock) + "]"
+			}else if (state instanceof ForStatement ||state instanceof WhileStatement) {
+				if (state instanceof ForStatement) {
+					methTree = methTree + "[For " + state.getCollectionExpression().getText() + ","
+				} else {
+					methTree = methTree + "[While " + state.getBooleanExpression().getText() +","
+				}
+				methTree = methTree + makeTreeBranching("", [state.getLoopBlock()]) + "]"
 				statements.removeAt(0)
 				methTree = methTree + makeTreeBranching(methTree, statements)
 				return methTree
-			}else {
-				log.append("no code yet for class" + statements.first().getClass())
+			}else if (state instanceof EmptyStatement || state instanceof BreakStatement  ){
+				statements.removeAt(0)
+				methTree = methTree + makeTreeBranching(methTree, statements)
+				return methTree
+			} else {
+				log.append("no code yet for class" + state.getClass())
 				return methTree
 			}
 		}else
@@ -157,46 +173,48 @@ class OPAnalysisAST extends CompilationCustomizer
 		def allMethodNodes = classNode.getAllDeclaredMethods()
 		def afterMain = false
 		def methTree = ""
-		println "DECLARED METHODS"
+		txtStarts = ["subscribe", "schedule", "runin", "runonce"]
 		log.append("DECLARED METHODS")
 		for (MethodNode meth : allMethodNodes){
-			methTree = ""
+			methTree = "["
+			allStarts.clear()
 			if (meth.getName() == "main")
 				afterMain = true
 			else if (afterMain == true && meth.getName() != "") {
 				methTree = meth.getName() + ": "
 				//ADD CODE
 				//above add parameters into methods
-				println methTree
 				if (meth.getCode() instanceof BlockStatement) {
 					List<Statement> statements = (List<Statement>) ((BlockStatement) meth.getCode()).getStatements()
 					methTree = makeTreeBranching(methTree, statements)
+					methTree = methTree + "]"
 					log.append(methTree)
-
 				}
 			}
 		}
+		
+		log.append("Starting Points: " + allStarts.toString())
 		if (stateHolder == 1)
 			log.append("IT HAS STATE")
 		else if (stateHolder == 2)
 			log.append("IT HAS ATOMICSTATE")
-			//println state.getText()
-		def allFieldNodes = classNode.getFields()
-		println "FIELDS"
-		for (String field : allFieldNodes){
-			println field
-		}
+		//def allFieldNodes = classNode.getFields()
+		//println "FIELDS"
+		//for (String field : allFieldNodes){
+		//	if (!(field.getName() == null))
+		//		println field.getName()
+		//}
 		ArrayList<String> declaredMethods = new ArrayList<String>()
 		allMethodNodes.each { it -> declaredMethods.add(it.getName().toLowerCase()) }
 				
 		//to compute declared fields, you must inspect the run() method
 		//injected by the groovy compiler
-        processApp(insnVis, declaredMethods)
+        //processApp(insnVis, declaredMethods)
 		
 		//compute type 2 overprivilege as the number of unused
 		//capabilities. These unused capabilities come from the device
 		//handlers that implement multiple capabilities
-		computeType2Overprivilege(insnVis, declaredMethods)
+		//computeType2Overprivilege(insnVis, declaredMethods)
 	}
 	
 	class MethodCodeVisitor extends ClassCodeVisitorSupport
