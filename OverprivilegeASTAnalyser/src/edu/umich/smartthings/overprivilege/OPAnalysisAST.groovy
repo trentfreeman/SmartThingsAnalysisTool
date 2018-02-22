@@ -114,7 +114,9 @@ class OPAnalysisAST extends CompilationCustomizer
 				List<Statement> states = (List<Statement>) ((BlockStatement) state).getStatements()
 				methTree = makeTreeBranching(methTree, states)
 			}else if (state instanceof ExpressionStatement || state instanceof ReturnStatement) {
-				if (state.getText().contains("atomicState.") ) {
+				if (state.getText().contains("log.debug")) {
+					
+				}else if (state.getText().contains("atomicState.") ) {
 					stateHolder = 2
 					methTree = methTree + "[" + state.getText() + "]"
 				}else if (state.getText().contains("state.") ) {
@@ -122,8 +124,9 @@ class OPAnalysisAST extends CompilationCustomizer
 					methTree = methTree + "[" + state.getText() + "]"
 				}else if (state.getText().contains("=")){
 					methTree = methTree + "[" + state.getText() + "]"
-				}else if (txtStarts.findAll{state.getText().toLowerCase().contains(it.toLowerCase())}.any{true}) {
-					allStarts.add(state.getText())
+				//}else if (txtStarts.findAll{state.getText().toLowerCase().contains(it.toLowerCase())}.any{true}) {
+				}else if (state.getText().contains("subscribe")) {
+					allStarts << state.getText()
 					methTree = methTree + "[" + state.getText() + "]"
 				}
 				statements.removeAt(0)
@@ -187,7 +190,6 @@ class OPAnalysisAST extends CompilationCustomizer
 				if (meth.getCode() instanceof BlockStatement) {
 					List<Statement> statements = (List<Statement>) ((BlockStatement) meth.getCode()).getStatements()
 					methTree = makeTreeBranching(methTree, statements)
-					methTree = methTree + "]"
 					log.append(methTree)
 				}
 			}
@@ -204,17 +206,18 @@ class OPAnalysisAST extends CompilationCustomizer
 		//	if (!(field.getName() == null))
 		//		println field.getName()
 		//}
+		stateHolder = 0
 		ArrayList<String> declaredMethods = new ArrayList<String>()
 		allMethodNodes.each { it -> declaredMethods.add(it.getName().toLowerCase()) }
 				
 		//to compute declared fields, you must inspect the run() method
 		//injected by the groovy compiler
-        //processApp(insnVis, declaredMethods)
+        processApp(insnVis, declaredMethods)
 		
 		//compute type 2 overprivilege as the number of unused
 		//capabilities. These unused capabilities come from the device
 		//handlers that implement multiple capabilities
-		//computeType2Overprivilege(insnVis, declaredMethods)
+		computeType2Overprivilege(insnVis, declaredMethods)
 	}
 	
 	class MethodCodeVisitor extends ClassCodeVisitorSupport
