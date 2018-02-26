@@ -4,16 +4,17 @@ import re
 class app:
     def __init__(self,string):
         self.StateVar = []
-        self.startNodes = findStarts(string)
+        self.startNodes = []
+        self.findStarts(string)
 
     def findStarts(self, string):
         arr = []
         for line in string:
             if 'this.subscribe' in  line:
-                arr = re.finall(r'this.subscribe\(.*\)', line)
+                arr = re.findall(r'this.subscribe\(.*\)', line)
                 for item in arr:
-                    x= start(item[item.index('(')+1:-1].split(','), text, self)
-                    self.startNodes += x
+                    x= start(item[item.index('(')+1:-1].split(','), string, self)
+                    self.startNodes += [x]
         
     def __repr__(self):
         return 'Application ' +self.name + '; Starts: [' + ', '.join(map(repr,self.startNodes)) + ']' 
@@ -23,10 +24,10 @@ class start:
         self.app = app
         self.event = arr[0].strip()
         #TODO: get datatype from capfulll.csv
-        self.evtType = findDataType(arr[0].strip())
+        #self.evtType = self.findDataType(arr[0].strip())
         for line in codeArr:
-            if arr[1].strip() +':' in line:
-                self.methodCall = method(arr[1].strip(), line, self.app)
+            if re.findall(arr[2].strip() + ':', line, flags = re.IGNORECASE):
+                self.methodCall = method(arr[2].strip(), line, self.app)
                 break
         
         def findDataType(self, cap):
@@ -38,82 +39,37 @@ class method:
         self.name = name
         self.app = app
         self.variables = []
-        self.Tree = Node(text, self)
+        self.tree = createTree(text.split(': ')[1], self, app)
 
 
-
-
-#TODO: ALL BELOW
-class Node:
-    def __init__(self, name, methodText, app):
-        #is this needed?
-        return parse()
-                
-    def parse(self, string):
-        #TODO: WORK ON PARSING THE IF STATEMENTS/ MAKING GENERAL PARSER (FOR LOOPS, WHILE LOOPS, etc.)
-        textArr = splitBrack(string)
-        for item in textArr:
-            if len(item) > 5:
-                if '[If' in item[0:4]: 
-                    arr = splitCommas(item)
-                    x = ifNode(arr, self.parent)
-                    self.arrNextNodes.append(x)
-                if '[(' in item[0:4]:
-                    arr = item.split('=')
-                    if len(arr) == 2:
-                        x = expresNode(arr, self.parent)
-                        self.arrNextNodes.append(x)
-                    else:
-                        print("I don't know how to categorize: " + item)
-            if 'subscribe' in item and not('unsubscribe' in item):
-                x= startNode(item, self.parent)
-                self.arrNextNodes.append(x)
-
-
-class methNode(Node):
-    def __init__(self, name, methodText, app):
-        self.name = name
-        self.parent = parent
-        self.arrNextNodes = []
-        self.parse(methodText)
-
-    def __repr__(self):
-        return self.name + '[' + ', '.join(map(repr, self.arrNextNodes)) + ']'
-
-                    
-class startNode(Node):
-    def __init__(self, string, parentApp, methodNode):
-        args = string[:-2].split('(')[1].split(',')
-        self.subTo = args[1].strip()
-        self.callFunc = args[2].strip()
-        self.parent = parent
-        parent.startNodes += [self]
-        self.methodNode = methodNode
-
-    def __repr__(self):
-        return self.subTo +' calls--> '+ self.callFunc 
-
-
-class expresNode:
-    def __init__(self, arr, parentApp, methodNode):
-        self.right = arr[0]
-        self.left = arr[1]
-        self.parent = parentApp
-        self.methodNode
+class expresNode():
+    def __init__(self, arr, method, app,text):
+        self.right = arr[0].strip()
+        if len(arr)>1:
+            self.left = arr[1].strip()
+        self.app = app
+        self.method = method
+        self.nextNode = parse(text, method, app) 
 
     def __repr__(self):
         return self.right + ' = ' + self.left 
 
 
-class ifNode(Node):
-    def __init__(self, ifArray, parentApp, methodNode):
-        self.parent = parent
+class ifNode():
+    def __init__(self, ifArray, method, app, text):
+        self.app = app
+        self.method = method
         #TODO: ADD || to if state
+        print('ifARRAY')
+        print(ifArray)
         self.ifState = ifArray[0].strip().split('&&')
-        self.trueBranch = Node(ifArray[1].strip(), self.parent)
-        self.falseBranch = Node(ifArray[2].strip(), self.parent)
-        self.parentApp = parentApp
-        self.methodNode = methodNode
+        trueArr = splitBrack(ifArray[1].strip())
+        self.trueBranch = parse(trueArr, self.method, self.app)
+        if len(ifArray) >2:
+            falseArr = splitBrack(ifArray[2].strip())
+            self.falseBranch = parse(falseArr, self.method, self.app)
+        if len(text)>0:
+            self.nextNode = parse(text, self.method, self.app)
 
     def __repr__(self):
        #TODO can only be done after parsing
@@ -155,6 +111,33 @@ def splitCommas(string):
             retArr.append(retStr)
     return retArr
 
+def createTree(text,method,app):
+    textArr = splitBrack(text)
+    return parse(textArr, method, app)
+
+def parse(textArr, method, app):
+    #TODO: WORK ON PARSING THE IF STATEMENTS/ MAKING GENERAL PARSER (FOR LOOPS, WHILE LOOPS, etc.)
+    #for textArr[0] in textArr:
+    print(textArr)
+    if re.findall(r'\[if|^(,\[if)', textArr[0], flags = re.IGNORECASE): 
+        arr = splitCommas(textArr[0])
+        print("splitting commas")
+        print(arr)
+        x = ifNode(arr, method, app, textArr[1:])
+        return x
+        #retNodes += x
+    elif re.findall(r'\[\(|^(,\[\()', textArr[0], flags = re.IGNORECASE):
+        arr = textArr[0].split('=')
+        if len(arr) == 2:
+            x = expresNode(arr, method, app, textArr[1:])
+            return x
+        #    retNodes += x
+        else:
+            print("I don't know how to categorize: " + textArr[0])
+            return
+    else:
+        print("I don't know how to categorize: " + textArr[0])
+        return
 
 #TODO: ADD PREPROCESSING TO REPLACE METHOD CALLS WITH METHOD TEXT
 #STARTING HERE
@@ -165,26 +148,19 @@ f.close()
 #fix for multiple apps
 stringArr = string.split('\n')
 methods = stringArr[stringArr.index('DECLARED METHODS') +1:stringArr.index('Starting Points: []')]
-print(methods)
 #code below is to replace method calls within methods with their text (very annoying)
 for line in methods:
-    print(line)
     matches ={x.lower() for x in methods if x.split(': ')[0].lower() in line.split(': ')[1].lower()}
     matches = list(matches)
     methodSplit = splitBrack(line.lower().split(': ')[1])
-    print(methodSplit)
-    print(matches)
     for match in matches:
         for text in methodSplit:
             #if "this.subscribe" in text:
                 #break
-            print(match.split(': ')[0])
-            print(text)
             if match.split(': ')[0] in text:
-                print("HELLO")
                 #TEST THIS WITH DIFFERENT OUTPUT, DOESN'T WORK WITH c02 MONITOR BECAUSE NO METHODCALLS WITHIN METHODS
                 methodSplit[methodSplit.index(text)] = re.sub(re.escape(match.split(': ')[0]) + '\(.*\)', match.split(': ')[1], text, flags=re.IGNORECASE)
     methods[methods.index(line)] = line.split(': ')[0] + ': ' + ''.join(methodSplit)
 #replace
-
-#testApp = app(string)
+stringArr[stringArr.index('DECLARED METHODS') +1:stringArr.index('Starting Points: []')] = methods
+testApp = app(stringArr)
