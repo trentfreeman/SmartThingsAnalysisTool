@@ -1,6 +1,5 @@
 import re
 
-#TODO: DONT FORGET REPR METHODS
 #DONT FORGET: give app init array of single app (starting with --app-start--)
 class app:
     def __init__(self,string):
@@ -176,7 +175,10 @@ def parse(textArr, method, app):
         print("I don't know how to categorize: " + textArr[0])
         return
 
-#TODO: ADD PREPROCESSING TO REPLACE METHOD CALLS WITH METHOD TEXT
+
+
+
+
 #STARTING HERE
 #TODO: MAKE THIS READ FROM overprivout.txt (THIS IS A FINAL THING)
 f= open('testing.txt','r')
@@ -198,6 +200,9 @@ for line in methods:
                 #TEST THIS WITH DIFFERENT OUTPUT, DOESN'T WORK WITH c02 MONITOR BECAUSE NO METHODCALLS WITHIN METHODS
                 methodSplit[methodSplit.index(text)] = re.sub(re.escape(match.split(': ')[0]) + '\(.*\)', match.split(': ')[1], text, flags=re.IGNORECASE)
     methods[methods.index(line)] = line.split(': ')[0] + ': ' + ''.join(methodSplit)
-#replace
+
+
+
+#MAKE TREE HERE
 stringArr[stringArr.index('DECLARED METHODS') +1:stringArr.index('Starting Points: []')] = methods
 testApp = app(stringArr)
