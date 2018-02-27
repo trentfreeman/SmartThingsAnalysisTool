@@ -1,8 +1,10 @@
 import re
 
 #TODO: DONT FORGET REPR METHODS
+#DONT FORGET: give app init array of single app (starting with --app-start--)
 class app:
     def __init__(self,string):
+        self.name = string[1].split(' ')[1]
         self.StateVar = []
         self.startNodes = []
         self.findStarts(string)
@@ -16,8 +18,15 @@ class app:
                     x= start(item[item.index('(')+1:-1].split(','), string, self)
                     self.startNodes += [x]
         
+    def asString(self):
+        string = 'Application ' +self.name + '; Starts: ['
+        string += ', '.join([x.asString() for x in self.startNodes])
+        string += ']'
+        return string
+
     def __repr__(self):
-        return 'Application ' +self.name + '; Starts: [' + ', '.join(map(repr,self.startNodes)) + ']' 
+        return self.asString()
+
 
 class start:
     def __init__(self, arr, codeArr, app):
@@ -30,9 +39,15 @@ class start:
                 self.methodCall = method(arr[2].strip(), line, self.app)
                 break
         
-        def findDataType(self, cap):
-            pass
+    def findDataType(self, cap):
+        pass
 
+    def asString(self):
+        string = self.methodCall.asString()
+        return string
+
+    def __repr__(self):
+        return self.asString()
 
 class method:
     def __init__(self, name, text, app):
@@ -41,6 +56,14 @@ class method:
         self.variables = []
         self.tree = createTree(text.split(': ')[1], self, app)
 
+    def asString(self):
+        string = ""
+        if self.tree != None:
+            string = self.name + ': ' +self.tree.asString()
+        return string
+
+    def __repr__(self):
+        return self.asString()
 
 class expresNode():
     def __init__(self, arr, method, app,text):
@@ -51,17 +74,24 @@ class expresNode():
         self.method = method
         self.nextNode = parse(text, method, app) 
 
-    def __repr__(self):
-        return self.right + ' = ' + self.left 
+    def asString(self):
+        string = ""
+        string = self.right + ' = ' + self.left 
+        if self.nextNode != None:
+            string += self.nextNode.asString()
+        return string
 
+    def __repr__(self):
+        return self.asString()
 
 class ifNode():
     def __init__(self, ifArray, method, app, text):
         self.app = app
         self.method = method
+        self.ifBranch = ""
+        self.trueBranch = ''
+        self.falseBranch = ''
         #TODO: ADD || to if state
-        print('ifARRAY')
-        print(ifArray)
         self.ifState = ifArray[0].strip().split('&&')
         trueArr = splitBrack(ifArray[1].strip())
         self.trueBranch = parse(trueArr, self.method, self.app)
@@ -71,10 +101,20 @@ class ifNode():
         if len(text)>0:
             self.nextNode = parse(text, self.method, self.app)
 
-    def __repr__(self):
-       #TODO can only be done after parsing
-       print('I NEED TO PUT SOMETHING HERE')
+    def asString(self):
+        string = '['+ ' && '.join(map(str,self.ifState)) + ', '
+        if self.trueBranch != '':
+            string += self.trueBranch.asString() 
+        string += ', '
+        if self.falseBranch != '':
+            string += self.falseBranch.asString() 
+        string += ']'
+        if self.nextNode != None:
+            string += self.nextNode.asString()
+        return string
 
+    def __repr__(self):
+        return self.asString()
 
 def splitBrack(string):
     left = 0
@@ -118,11 +158,8 @@ def createTree(text,method,app):
 def parse(textArr, method, app):
     #TODO: WORK ON PARSING THE IF STATEMENTS/ MAKING GENERAL PARSER (FOR LOOPS, WHILE LOOPS, etc.)
     #for textArr[0] in textArr:
-    print(textArr)
     if re.findall(r'\[if|^(,\[if)', textArr[0], flags = re.IGNORECASE): 
         arr = splitCommas(textArr[0])
-        print("splitting commas")
-        print(arr)
         x = ifNode(arr, method, app, textArr[1:])
         return x
         #retNodes += x
