@@ -4,6 +4,7 @@ import re
 class app:
     def __init__(self,string):
         self.name = string[1].split(' ')[1]
+        #TODO: DO I NEED SEPERATE DEVICE STATE ARRAY OR ADD TO STATE ARRAY
         self.StateVar = []
         self.startNodes = []
         self.findStarts(string)
@@ -67,8 +68,14 @@ class method:
 class expresNode():
     def __init__(self, arr, method, app,text):
         self.right = arr[0].strip()
+	if 'state.' in self.right.lower() or 'atomicstate.' in self.right.lower():
+            if not(self.right in app.StateVar):
+                app.StateVar += self.right
         if len(arr)>1:
             self.left = arr[1].strip()
+            if 'state.' in self.left.lower() or 'atomicstate.' in self.left.lower():
+            if not(self.left in app.StateVar):
+                app.StateVar += self.left
         self.app = app
         self.method = method
         self.nextNode = parse(text, method, app) 
@@ -101,7 +108,7 @@ class ifNode():
             self.nextNode = parse(text, self.method, self.app)
 
     def asString(self):
-        string = '['+ ' && '.join(map(str,self.ifState)) + ', '
+        string = '['+ ' && '.join(map(str,self.ifState)) + ' '
         if self.trueBranch != '':
             string += self.trueBranch.asString() 
         string += ', '
