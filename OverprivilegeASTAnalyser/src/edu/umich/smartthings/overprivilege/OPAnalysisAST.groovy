@@ -57,6 +57,7 @@ class OPAnalysisAST extends CompilationCustomizer
 	List allCapsList
 	List allStarts
 	List txtStarts
+	Set reqAttr 
 	
 	int numCmdOverpriv
 	int numAttrOverpriv
@@ -90,7 +91,8 @@ class OPAnalysisAST extends CompilationCustomizer
 		allCapsList = new ArrayList()
 		allStarts = new ArrayList()
 		txtStarts = new ArrayList()
-		
+		reqAttr = new ArrayList() 
+
 		numCmdOverpriv = 0
 		numAttrOverpriv = 0
 		numTotalOverpriv = 0
@@ -125,7 +127,16 @@ class OPAnalysisAST extends CompilationCustomizer
 				}else if (state.getText().contains("=")){
 					methTree = methTree + "[" + state.getText() + "]"
 				//}else if (txtStarts.findAll{state.getText().toLowerCase().contains(it.toLowerCase())}.any{true}) {
-				}else if (state.getText().contains("subscribe")) {
+				} else if (reqAttr.each {x -> state.getText().contains(x )}){
+					if (state.getExpression() instanceof MethodCallExpression) {
+						if (state.getExpression().getArguments()[0] instanceof ClosureExpression) {
+							methTree = methTree + "[" + state.getExpression().getText() + state.getExpression().getArguments()[0].getCode().getText() + "]"
+						}
+					}else {
+						methTree = methTree + "[" + state.getText() + "]"
+					}
+				}
+				else if (state.getText().contains("subscribe")) {
 					allStarts << state.getText()
 					methTree = methTree + "[" + state.getText() + "]"
 				}
@@ -163,7 +174,7 @@ class OPAnalysisAST extends CompilationCustomizer
 	}
 	@Override
 	void call(SourceUnit source, GeneratorContext context, ClassNode classNode) {
-		
+		def allMethodNodes = classNode.getAllDeclaredMethods()
 		//step 1: run a MethodCodeVisitor that will accumulate 
 		//DeclarationExpressions
 		MethodCodeVisitor mcvDex = new MethodCodeVisitor()
@@ -172,8 +183,25 @@ class OPAnalysisAST extends CompilationCustomizer
 		//step 2: run an instruction visitor
 		InsnVisitor insnVis = new InsnVisitor(mcvDex.dexpressions, mcvDex.bexpressions)
 		classNode.visitContents(insnVis)
+
+		ArrayList<String> declaredMethods = new ArrayList<String>()
+		allMethodNodes.each { it -> declaredMethods.add(it.getName().toLowerCase()) }
+				
+		//to compute declared fields, you must inspect the run() method
+		//injected by the groovy compiler
+        reqAttr = processApp(insnVis, declaredMethods)
 		
-		def allMethodNodes = classNode.getAllDeclaredMethods()
+		//compute type 2 overprivilege as the number of unused
+		//capabilities. These unused capabilities come from the device
+		//handlers that implement multiple capabilities
+		computeType2Overprivilege(insnVis, declaredMethods)
+
+		if (reqAttr != null) {
+			println "REQUESTED ATTR"
+			reqAttr = reqAttr.toList()
+			reqAttr.each {x -> println 'hi' + x} 
+		}
+
 		def afterMain = false
 		def methTree = ""
 		txtStarts = ["subscribe", "schedule", "runin", "runonce"]
@@ -207,17 +235,6 @@ class OPAnalysisAST extends CompilationCustomizer
 		//		println field.getName()
 		//}
 		stateHolder = 0
-		ArrayList<String> declaredMethods = new ArrayList<String>()
-		allMethodNodes.each { it -> declaredMethods.add(it.getName().toLowerCase()) }
-				
-		//to compute declared fields, you must inspect the run() method
-		//injected by the groovy compiler
-        processApp(insnVis, declaredMethods)
-		
-		//compute type 2 overprivilege as the number of unused
-		//capabilities. These unused capabilities come from the device
-		//handlers that implement multiple capabilities
-		computeType2Overprivilege(insnVis, declaredMethods)
 	}
 	
 	class MethodCodeVisitor extends ClassCodeVisitorSupport
@@ -1293,13 +1310,13 @@ class OPAnalysisAST extends CompilationCustomizer
 		for (BinaryExpression bex : insnVis.allbexprs){
 			println bex.getText()
 		}
-		log.append "Methods below"
-		for (String attr : declaredMethods){
-			if(attr == "main") 
-				afterMain = true
-			else if (afterMain == true)
-				log.append attr
-		}
+//		log.append "Methods below"
+//		for (String attr : declaredMethods){
+//			if(attr == "main") 
+//				afterMain = true
+//			else if (afterMain == true)
+//				log.append attr
+//		}
 				
 		def reflIndex = calledMethods?.toList().any { v -> v?.contains("\$") }
 		if(reflIndex)
@@ -1429,6 +1446,12 @@ class OPAnalysisAST extends CompilationCustomizer
 		{
 			numInternet += 1
 		}
+		if (reqAttrs != null) {
+			println "REQUESTED ATTR"
+			reqAttrs = reqAttrs.toList()
+			reqAttrs.each {x -> println 'hi' + x}
+		}
+		return reqAttrs 
 	}
 	
 	def getCalledMethodsProps(InsnVisitor insnVis)
