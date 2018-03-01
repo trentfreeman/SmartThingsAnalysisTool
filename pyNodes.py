@@ -1,13 +1,21 @@
 import re
 
 #DONT FORGET: give app init array of single app (starting with --app-start--)
+###############   NODE CODE  #####################################################
 class app:
     def __init__(self,string):
         self.name = string[1].split(' ')[1]
         #TODO: DO I NEED SEPERATE DEVICE STATE ARRAY OR ADD TO STATE ARRAY
         self.StateVar = []
+        self.deviceStates = self.findDevs(string)
         self.startNodes = []
         self.findStarts(string)
+    
+    def findDevs(self, string):
+        deviceLine = [x for x in string if "requested attrs:" in x][0][17:-1].split(', ')
+        print(deviceLine)
+        return deviceLine
+        
 
     def findStarts(self, string):
         arr = []
@@ -67,15 +75,18 @@ class method:
 
 class expresNode():
     def __init__(self, arr, method, app,text):
+        self.hasState = False
         self.right = arr[0].strip()
-	if 'state.' in self.right.lower() or 'atomicstate.' in self.right.lower():
+        if 'state.' in self.right.lower() or 'atomicstate.' in self.right.lower():
+            self.hasState = True
             if not(self.right in app.StateVar):
                 app.StateVar += self.right
         if len(arr)>1:
             self.left = arr[1].strip()
             if 'state.' in self.left.lower() or 'atomicstate.' in self.left.lower():
-            if not(self.left in app.StateVar):
-                app.StateVar += self.left
+                self.hasState = True
+                if not(self.left in app.StateVar):
+                    app.StateVar += self.left
         self.app = app
         self.method = method
         self.nextNode = parse(text, method, app) 
@@ -95,8 +106,8 @@ class ifNode():
         self.app = app
         self.method = method
         self.ifBranch = ""
-        self.trueBranch = ''
-        self.falseBranch = ''
+        self.trueBranch = None
+        self.falseBranch = None
         #TODO: ADD || to if state
         self.ifState = ifArray[0].strip().split('&&')
         trueArr = splitBrack(ifArray[1].strip())
@@ -109,10 +120,10 @@ class ifNode():
 
     def asString(self):
         string = '['+ ' && '.join(map(str,self.ifState)) + ' '
-        if self.trueBranch != '':
+        if self.trueBranch != None:
             string += self.trueBranch.asString() 
         string += ', '
-        if self.falseBranch != '':
+        if self.falseBranch != None:
             string += self.falseBranch.asString() 
         string += ']'
         if self.nextNode != None:
@@ -122,6 +133,29 @@ class ifNode():
     def __repr__(self):
         return self.asString()
 
+
+############# Path FUNCTIONS ###################################
+
+class path:
+    def __init__(self, startMeth):
+        self.start = startMeth
+        self.app = startMeth.app
+        self.expresVars = []
+        self.nodePath = []
+        self.findPath()
+
+    def findPath(self):
+        nodeCurrent = self.start.methodCall.tree
+        while nodeCurrent.nextNode != None:
+            self.nodePath += [nodeCurrent]
+            if nodeCurrent.__class__.__name__ == "expresNode":
+                if nodeCurrent.hasState == True:
+                    self.expresVars += [nodeCurrent.left + ' = ' + nodeCurrent.right]
+            nodeCurrent = nodeCurrent.nextNode
+
+
+
+############# Helper FUNCTIONS #################################
 def splitBrack(string):
     left = 0
     right = 0

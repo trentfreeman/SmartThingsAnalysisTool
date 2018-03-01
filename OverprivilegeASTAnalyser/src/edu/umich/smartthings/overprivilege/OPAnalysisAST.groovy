@@ -127,6 +127,8 @@ class OPAnalysisAST extends CompilationCustomizer
 				}else if (state.getText().contains("=")){
 					methTree = methTree + "[" + state.getText() + "]"
 				//}else if (txtStarts.findAll{state.getText().toLowerCase().contains(it.toLowerCase())}.any{true}) {
+				}else if (state.getText().contains("subscribe")) {
+					methTree = methTree + "[" + state.getText() + "]"
 				} else if (reqAttr.each {x -> state.getText().contains(x )}){
 					if (state.getExpression() instanceof MethodCallExpression) {
 						if (state.getExpression().getArguments()[0] instanceof ClosureExpression) {
@@ -135,11 +137,7 @@ class OPAnalysisAST extends CompilationCustomizer
 					}else {
 						methTree = methTree + "[" + state.getText() + "]"
 					}
-				}
-				else if (state.getText().contains("subscribe")) {
-					allStarts << state.getText()
-					methTree = methTree + "[" + state.getText() + "]"
-				}
+				} 
 				statements.removeAt(0)
 				methTree = makeTreeBranching(methTree, statements)
 				return methTree

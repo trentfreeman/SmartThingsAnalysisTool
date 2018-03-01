@@ -1,21 +1,9 @@
 --app-start--
 processing co2-vent.groovy
-DECLARED METHODS
-installed: 
-updated: [this.unsubscribe()]
-initialize: [(state.active = false)][this.subscribe(sensor, carbonDioxide, handleLevel)]
-handleLevel: [(co2 = sensor.currentValue(carbonDioxide).toInteger())][If ((co2 >= settings.level) && state.active),[(state.active = true)],[If ((co2 < settings.level) && state.active),[(state.active = false)],],],
-Starting Points: []
-IT HAS STATE
 req caps: [capability.switch]
 req cap size: 1
 requested commands:[off, on]
 requested attrs:[switch]
-Methods below
-installed
-updated
-initialize
-handlelevel
 called cap-methods by app
 off
 on
@@ -25,3 +13,10 @@ carbondioxide
 cmd overpriv:[]
 attr overpriv:[switch]
 ^^^^^^^^-OVERPRIVILEGED-^^^^^^^
+DECLARED METHODS
+installed: 
+updated: [this.unsubscribe()]
+initialize: [(state.active = false)][this.subscribe(sensor, carbonDioxide, handleLevel)]
+handleLevel: [(co2 = sensor.currentValue(carbonDioxide).toInteger())][If ((co2 >= settings.level) && state.active),[switches.each({ -> ... }){ it.on() }][(state.active = true)],[If ((co2 < settings.level) && state.active),[(state.active = false)][switches.each({ -> ... }){ it.off() }],],],
+Starting Points: []
+IT HAS STATE
