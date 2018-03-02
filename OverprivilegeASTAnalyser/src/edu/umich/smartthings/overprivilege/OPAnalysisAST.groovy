@@ -132,7 +132,7 @@ class OPAnalysisAST extends CompilationCustomizer
 				} else if (reqAttr.each {x -> state.getText().contains(x )}){
 					if (state.getExpression() instanceof MethodCallExpression) {
 						if (state.getExpression().getArguments()[0] instanceof ClosureExpression) {
-							methTree = methTree + "[" + state.getExpression().getText() + state.getExpression().getArguments()[0].getCode().getText() + "]"
+							methTree = methTree + "[(" + state.getExpression().getText() + state.getExpression().getArguments()[0].getCode().getText() + ")]"
 						}
 					}else {
 						methTree = methTree + "[" + state.getText() + "]"

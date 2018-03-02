@@ -1,4 +1,5 @@
 import re
+import copy
 
 #DONT FORGET: give app init array of single app (starting with --app-start--)
 ###############   NODE CODE  #####################################################
@@ -12,10 +13,13 @@ class app:
         self.findStarts(string)
     
     def findDevs(self, string):
+        deviceArr = []
         deviceLine = [x for x in string if "requested attrs:" in x][0][17:-1].split(', ')
-        print(deviceLine)
-        return deviceLine
-        
+        for device in deviceLine:
+            x = deviceAttr(device)
+            deviceArr += [x]
+        return deviceArr
+
 
     def findStarts(self, string):
         arr = []
@@ -35,6 +39,17 @@ class app:
     def __repr__(self):
         return self.asString()
 
+class deviceAttr():
+    def __init__(self, attr):
+        self.attr = attr
+        self.commands = []
+        f = open('Capabilities.csv', 'r')
+        lines = f.read().split('\n')
+        f.close()
+        #because this is a well structured csv, I do this with no errors
+        for x in lines:
+            if 'capability.'+attr+',' in x:
+                self.commands = x.split(',')[2].split(' ') 
 
 class start:
     def __init__(self, arr, codeArr, app):
@@ -73,9 +88,12 @@ class method:
     def __repr__(self):
         return self.asString()
 
+
+
 class expresNode():
-    def __init__(self, arr, method, app,text):
+    def __init__(self, arr, method, app,text, deviceExpres = False):
         self.hasState = False
+        self.deviceExpres = deviceExpres
         self.right = arr[0].strip()
         if 'state.' in self.right.lower() or 'atomicstate.' in self.right.lower():
             self.hasState = True
@@ -93,7 +111,10 @@ class expresNode():
 
     def asString(self):
         string = ""
-        string = self.right + ' = ' + self.left 
+        if self.deviceExpres == True:
+            string = '['+self.right + ' -> ' + self.left+']' 
+        else:
+            string = self.right + ' = ' + self.left 
         if self.nextNode != None:
             string += self.nextNode.asString()
         return string
@@ -101,11 +122,15 @@ class expresNode():
     def __repr__(self):
         return self.asString()
 
+
+
+
 class ifNode():
     def __init__(self, ifArray, method, app, text):
         self.app = app
         self.method = method
         self.ifBranch = ""
+        #TODO: ELSE IFs
         self.trueBranch = None
         self.falseBranch = None
         #TODO: ADD || to if state
@@ -137,24 +162,58 @@ class ifNode():
 ############# Path FUNCTIONS ###################################
 
 class path:
+    def __init__(self, startMeth, allPathsObj, path = [], expresVars = [] ):
+        self.start = startMeth
+        self.app = startMeth.app
+        self.expresVars = expresVars
+        self.nodePath = path
+        self.allPathsObj = allPathsObj
+
+    def findPath(self):
+        pass
+
+    def asString(self):
+        string = ""
+        for item in self.nodePath:
+            if item != None:
+                string += item.__class__.__name__
+        return string
+
+    def __repr__(self):
+        return self.asString()
+
+class allPaths1Start:
     def __init__(self, startMeth):
         self.start = startMeth
         self.app = startMeth.app
         self.expresVars = []
-        self.nodePath = []
-        self.findPath()
+        self.paths = []
+        x = path(startMeth, self)
+        self.findPaths(x, startMeth.methodCall.tree)
 
-    def findPath(self):
-        nodeCurrent = self.start.methodCall.tree
-        while nodeCurrent.nextNode != None:
-            self.nodePath += [nodeCurrent]
-            if nodeCurrent.__class__.__name__ == "expresNode":
-                if nodeCurrent.hasState == True:
-                    self.expresVars += [nodeCurrent.left + ' = ' + nodeCurrent.right]
-            nodeCurrent = nodeCurrent.nextNode
+    def findPaths(self, pathObj, node):
+        nodeCurrent = node
+        if nodeCurrent == None:
+            return
+        while nodeCurrent != None:
+            nodeClass = nodeCurrent.__class__.__name__
+            pathObj.nodePath += [nodeCurrent]
+            if nodeClass == "expresNode":
+                nodeCurrent = nodeCurrent.nextNode
+            elif nodeClass == "ifNode":
+                if nodeCurrent.trueBranch != None:
+                    pathTrue = path(pathObj.start, pathObj.allPathsObj, copy.copy(pathObj.nodePath), pathObj.expresVars)
+                    self.findPaths(pathTrue, nodeCurrent.trueBranch)
+                if nodeCurrent.falseBranch != None:
+                    pathFalse = path(pathObj.start, pathObj.allPathsObj, copy.copy(pathObj.nodePath), pathObj.expresVars)
+                    self.findPaths(pathFalse, nodeCurrent.falseBranch)
+                nodeCurrent = nodeCurrent.nextNode
+        self.paths += [pathObj]
+
+                
 
 
-
+            
 ############# Helper FUNCTIONS #################################
 def splitBrack(string):
     left = 0
@@ -212,6 +271,15 @@ def parse(textArr, method, app):
         else:
             print("I don't know how to categorize: " + textArr[0])
             return
+    elif bool([x for x in app.deviceStates if x.attr in textArr[0]]):
+        device = [x for x in app.deviceStates if x.attr in textArr[0]][0]
+        arr = re.findall(re.escape(device.attr)+'.*\.', textArr[0], flags = re.IGNORECASE)
+        for cmd in device.commands:
+            if cmd in textArr[0]:
+                arr += cmd
+                break
+        x = expresNode(arr,method,app,textArr[1:], True)
+        return x
     else:
         print("I don't know how to categorize: " + textArr[0])
         return
@@ -222,28 +290,31 @@ def parse(textArr, method, app):
 
 #STARTING HERE
 #TODO: MAKE THIS READ FROM overprivout.txt (THIS IS A FINAL THING)
-f= open('testing.txt','r')
-string = f.read()
-f.close()
-#fix for multiple apps
-stringArr = string.split('\n')
-methods = stringArr[stringArr.index('DECLARED METHODS') +1:stringArr.index('Starting Points: []')]
-#code below is to replace method calls within methods with their text (very annoying)
-for line in methods:
-    matches ={x.lower() for x in methods if x.split(': ')[0].lower() in line.split(': ')[1].lower()}
-    matches = list(matches)
-    methodSplit = splitBrack(line.lower().split(': ')[1])
-    for match in matches:
-        for text in methodSplit:
-            #if "this.subscribe" in text:
-                #break
-            if match.split(': ')[0] in text:
-                #TEST THIS WITH DIFFERENT OUTPUT, DOESN'T WORK WITH c02 MONITOR BECAUSE NO METHODCALLS WITHIN METHODS
-                methodSplit[methodSplit.index(text)] = re.sub(re.escape(match.split(': ')[0]) + '\(.*\)', match.split(': ')[1], text, flags=re.IGNORECASE)
-    methods[methods.index(line)] = line.split(': ')[0] + ': ' + ''.join(methodSplit)
+def initializeString(fileName):
+    f= open(fileName,'r')
+    string = f.read()
+    f.close()
+    #fix for multiple apps
+    stringArr = string.split('\n')
+    methods = stringArr[stringArr.index('DECLARED METHODS') +1:stringArr.index('Starting Points: []')]
+    #code below is to replace method calls within methods with their text (very annoying)
+    for line in methods:
+        matches =[x.lower() for x in methods if x.split(': ')[0].lower() in line.split(': ')[1].lower()]
+        methodSplit = splitBrack(line.lower().split(': ')[1])
+        for match in matches:
+            for text in methodSplit:
+                #if "this.subscribe" in text:
+                    #break
+                if match.split(': ')[0] in text:
+                    #TEST THIS WITH DIFFERENT OUTPUT, DOESN'T WORK WITH c02 MONITOR BECAUSE NO METHODCALLS WITHIN METHODS
+                    #On second thought i dont know if this works the way i want it to. surprise surprise
+                    methodSplit[methodSplit.index(text)] = re.sub(re.escape(match.split(': ')[0]) + '\(.*\)', match.split(': ')[1], text, flags=re.IGNORECASE)
+        methods[methods.index(line)] = line.split(': ')[0] + ': ' + ''.join(methodSplit)
+    stringArr[stringArr.index('DECLARED METHODS') +1:stringArr.index('Starting Points: []')] = methods
+    return stringArr
 
 
 
 #MAKE TREE HERE
-stringArr[stringArr.index('DECLARED METHODS') +1:stringArr.index('Starting Points: []')] = methods
+stringArr = initializeString('testing.txt')
 testApp = app(stringArr)
