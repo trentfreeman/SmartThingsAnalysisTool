@@ -1,6 +1,8 @@
 import re
 import copy
 
+                
+
 #DONT FORGET: give app init array of single app (starting with --app-start--)
 ###############   NODE CODE  #####################################################
 class app:
@@ -26,13 +28,15 @@ class app:
         for line in string:
             if 'this.subscribe' in  line:
                 arr = re.findall(r'this.subscribe\(.*\)', line)
+                print(arr)
                 for item in arr:
                     x= start(item[item.index('(')+1:-1].split(','), string, self)
+                    print(x)
                     self.startNodes += [x]
         
     def asString(self):
-        string = 'Application ' +self.name + '; Starts: ['
-        string += ', '.join([x.asString() for x in self.startNodes])
+        string = 'Application ' +self.name + '\nStarts: ['
+        string += '\n'.join([x.asString()+'\n' for x in self.startNodes])
         string += ']'
         return string
 
@@ -49,7 +53,7 @@ class deviceAttr():
         #because this is a well structured csv, I do this with no errors
         for x in lines:
             if 'capability.'+attr+',' in x:
-                self.commands = x.split(',')[2].split(' ') 
+                self.commands = x.split(',')[3].split(' ') 
 
 class start:
     def __init__(self, arr, codeArr, app):
@@ -82,7 +86,7 @@ class method:
     def asString(self):
         string = ""
         if self.tree != None:
-            string = self.name + ': ' +self.tree.asString()
+            string = self.name + ': \n' +self.tree.asString()
         return string
 
     def __repr__(self):
@@ -94,17 +98,17 @@ class expresNode():
     def __init__(self, arr, method, app,text, deviceExpres = False):
         self.hasState = False
         self.deviceExpres = deviceExpres
-        self.right = arr[0].strip()
+        self.right = arr[0].strip('[]() ')
         if 'state.' in self.right.lower() or 'atomicstate.' in self.right.lower():
             self.hasState = True
             if not(self.right in app.StateVar):
-                app.StateVar += self.right
+                app.StateVar += [self.right]
         if len(arr)>1:
-            self.left = arr[1].strip()
+            self.left = arr[1].strip('[]() ')
             if 'state.' in self.left.lower() or 'atomicstate.' in self.left.lower():
                 self.hasState = True
                 if not(self.left in app.StateVar):
-                    app.StateVar += self.left
+                    app.StateVar += [self.left]
         self.app = app
         self.method = method
         self.nextNode = parse(text, method, app) 
@@ -112,17 +116,15 @@ class expresNode():
     def asString(self):
         string = ""
         if self.deviceExpres == True:
-            string = '['+self.right + ' -> ' + self.left+']' 
+            string = '[('+self.right + ' -> ' + self.left+')]' 
         else:
-            string = self.right + ' = ' + self.left 
+            string = '[('+ self.right + ' = ' + self.left+')]'
         if self.nextNode != None:
             string += self.nextNode.asString()
-        return string
+        return string 
 
     def __repr__(self):
         return self.asString()
-
-
 
 
 class ifNode():
@@ -153,12 +155,15 @@ class ifNode():
         string += ']'
         if self.nextNode != None:
             string += self.nextNode.asString()
-        return string
+        return string 
 
     def __repr__(self):
         return self.asString()
 
+                
 
+
+            
 ############# Path FUNCTIONS ###################################
 
 class path:
@@ -250,9 +255,11 @@ def splitCommas(string):
             retArr.append(retStr)
     return retArr
 
+
 def createTree(text,method,app):
     textArr = splitBrack(text)
     return parse(textArr, method, app)
+
 
 def parse(textArr, method, app):
     #TODO: WORK ON PARSING THE IF STATEMENTS/ MAKING GENERAL PARSER (FOR LOOPS, WHILE LOOPS, etc.)
@@ -273,11 +280,13 @@ def parse(textArr, method, app):
             return
     elif bool([x for x in app.deviceStates if x.attr in textArr[0]]):
         device = [x for x in app.deviceStates if x.attr in textArr[0]][0]
-        arr = re.findall(re.escape(device.attr)+'.*\.', textArr[0], flags = re.IGNORECASE)
+        print(textArr[0])
+        arr = re.findall(re.escape(device.attr)+'\w*\.\w*', textArr[0], flags = re.IGNORECASE)
         for cmd in device.commands:
             if cmd in textArr[0]:
-                arr += cmd
+                arr += [cmd]
                 break
+        print(arr)
         x = expresNode(arr,method,app,textArr[1:], True)
         return x
     else:
@@ -285,11 +294,6 @@ def parse(textArr, method, app):
         return
 
 
-
-
-
-#STARTING HERE
-#TODO: MAKE THIS READ FROM overprivout.txt (THIS IS A FINAL THING)
 def initializeString(fileName):
     f= open(fileName,'r')
     string = f.read()
@@ -314,7 +318,62 @@ def initializeString(fileName):
     return stringArr
 
 
+def getAllBoolLists(arr, num):
+    if num == 0:
+        return [arr]
+    else:
+        arrT = getAllBoolLists(arr+[True], num-1)
+        arrF = getAllBoolLists(arr+[False], num-1)
+        return arrT +arrF
 
+
+#startVars are assumed to only be Bools
+def getAllPossibleStarts(app):
+    allStarts = []
+    stateStarts = []
+    arrArrBools = getAllBoolLists([], len(app.StateVar))
+    for arrBools in arrArrBools:
+        dictState = {}
+        for i in range(0,len(arrBools)):
+            dictState[app.StateVar[i]] = arrBools[i]
+        stateStarts += [dictState]
+    deviceState = {}
+    deviceStarts = []
+    for device in app.deviceStates:
+        if deviceStarts == []:
+            for item in device.commands:
+                deviceState[device.attr] = item
+                print(item)
+                deviceStarts += [deviceState.copy()]
+        else:
+            deviceStartsCP = deviceStarts.copy()
+            for item in deviceStartsCP:
+                for command in device.commands:
+                    item[device.attr] = command
+                    deviceStarts += [item]
+            #remove dupes
+    if stateStarts ==[]:
+        allStarts = deviceStarts
+    else:
+        for item in stateStarts:
+            for device in deviceStarts:
+                for k in device:
+                    item[k] =device[k] 
+                    print(item)
+                    allStarts += [item.copy()]
+    return allStarts
+
+
+
+        
+
+
+
+                
+
+
+#STARTING HERE
+#TODO: MAKE THIS READ FROM overprivout.txt (THIS IS A FINAL THING)            
 #MAKE TREE HERE
 stringArr = initializeString('testing.txt')
 testApp = app(stringArr)
