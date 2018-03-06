@@ -1,5 +1,6 @@
 import re
 import copy
+import itertools
 
                 
 
@@ -93,8 +94,13 @@ class method:
         return self.asString()
 
 
+class baseNode():
+    def __init__(self, method):
+        self.nextNode = None
+        self.method = method
+        self.app = self.method.app
 
-class expresNode():
+class expresNode(baseNode):
     def __init__(self, arr, method, app,text, deviceExpres = False):
         self.hasState = False
         self.deviceExpres = deviceExpres
@@ -127,7 +133,7 @@ class expresNode():
         return self.asString()
 
 
-class ifNode():
+class ifNode(baseNode):
     def __init__(self, ifArray, method, app, text):
         self.app = app
         self.method = method
@@ -167,53 +173,46 @@ class ifNode():
 ############# Path FUNCTIONS ###################################
 
 class path:
-    def __init__(self, startMeth, allPathsObj, path = [], expresVars = [] ):
+    def __init__(self, startMeth, path = []):
         self.start = startMeth
         self.app = startMeth.app
-        self.expresVars = expresVars
         self.nodePath = path
-        self.allPathsObj = allPathsObj
-
-    def findPath(self):
-        pass
 
     def asString(self):
         string = ""
         for item in self.nodePath:
             if item != None:
-                string += item.__class__.__name__
+                string += item.__class__.__name__ +'\n'
         return string
 
     def __repr__(self):
         return self.asString()
 
-class allPaths1Start:
-    def __init__(self, startMeth):
-        self.start = startMeth
-        self.app = startMeth.app
-        self.expresVars = []
+class allPaths:
+    def __init__(self, app):
+        self.app = app
         self.paths = []
-        x = path(startMeth, self)
-        self.findPaths(x, startMeth.methodCall.tree)
+        self.allStarts = self.app.startNodes
+        #This only does one startNode right now, a for loop would fix this
+    
+    def findPaths(self):
+        for item in self.allStarts:
+            self.findPathsRecurse(item, item.methodCall.tree)
 
-    def findPaths(self, pathObj, node):
+    def findPathsRecurse(self, start, node = None, pathArr = []):
         nodeCurrent = node
-        if nodeCurrent == None:
-            return
         while nodeCurrent != None:
             nodeClass = nodeCurrent.__class__.__name__
-            pathObj.nodePath += [nodeCurrent]
+            pathArr += [nodeCurrent]
             if nodeClass == "expresNode":
                 nodeCurrent = nodeCurrent.nextNode
             elif nodeClass == "ifNode":
                 if nodeCurrent.trueBranch != None:
-                    pathTrue = path(pathObj.start, pathObj.allPathsObj, copy.copy(pathObj.nodePath), pathObj.expresVars)
-                    self.findPaths(pathTrue, nodeCurrent.trueBranch)
+                    self.findPathsRecurse(start, nodeCurrent.trueBranch, copy.copy(pathArr))
                 if nodeCurrent.falseBranch != None:
-                    pathFalse = path(pathObj.start, pathObj.allPathsObj, copy.copy(pathObj.nodePath), pathObj.expresVars)
-                    self.findPaths(pathFalse, nodeCurrent.falseBranch)
+                    self.findPathsRecurse(start, nodeCurrent.falseBranch, copy.copy(pathArr))
                 nodeCurrent = nodeCurrent.nextNode
-        self.paths += [pathObj]
+        self.paths += [path(start, pathArr)]
 
                 
 
@@ -363,11 +362,25 @@ def getAllPossibleStarts(app):
                     allStarts += [item.copy()]
     return allStarts
 
-
-
-        
-
-
+#taken and adapted from https://stackoverflow.com/questions/15306231/how-to-calculate-all-interleavings-of-two-lists
+def interleaving(path1, path2):
+    allInter = []
+    singleInter = [None]*(len(path1) +len(path2))
+    for combo in itertools.combinations(range(0,len(singleInter)), len(path1)):
+        singleInter = [None]*(len(path1) +len(path2))
+        index1 = 0
+        index2 = 0
+        for item in combo:
+            singleInter[item] = path1[index1]
+            index1+=1
+        for i in range(0,len(singleInter)):
+            if singleInter[i] == None:
+                singleInter[i] = path2[index2]
+                index2+=1
+        singleInter = [combo] +singleInter
+        allInter.append(singleInter)
+    return allInter
+                
 
                 
 
