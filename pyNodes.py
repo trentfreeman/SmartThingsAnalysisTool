@@ -44,7 +44,7 @@ class app:
     def __repr__(self):
         return self.asString()
 
-class deviceAttr():
+class deviceAttr:
     def __init__(self, attr):
         self.attr = attr
         self.commands = []
@@ -216,6 +216,34 @@ class allPaths:
 
                 
 
+############# Comparison FUNCTIONS ###################################
+class compareInterPathStarts:
+    def __init__(self, path, starts):
+        self.path1Placements = path[0]
+        self.pathInter = path[1:]
+        self.starts = starts
+
+    def racePossible(self):
+        racePossible = False
+        tup = self.path1Placements
+        #if a path is using state variables
+        isUsingState Arr = [False,False]
+        if (tup[0] == len(pathInter) - len(tup) or tup[0] = 0) and sequenceInOrder(tup):
+            return False
+        else:
+            itemPathNum = None
+            for item in self.pathInter:
+                if self.pathInter.index(item) in tup:
+                    itemPathNum = 1
+                    tup = tup[1:]
+                else:
+                    itemPathNum = 2
+                classType = item.__class__.__name__
+                if classType = 'expresNode':
+                    if item.hasState and 'state' in item.left:
+                        isUsingStateArr[itemPathNum-1] = 1
+#TODO CHECK FOR RACES (if both are editing state variables)
+
 
             
 ############# Helper FUNCTIONS #################################
@@ -298,6 +326,7 @@ def initializeString(fileName):
     string = f.read()
     f.close()
     #fix for multiple apps
+    string = string.lower()
     stringArr = string.split('\n')
     methods = stringArr[stringArr.index('DECLARED METHODS') +1:stringArr.index('Starting Points: []')]
     #code below is to replace method calls within methods with their text (very annoying)
@@ -380,6 +409,17 @@ def interleaving(path1, path2):
         singleInter = [combo] +singleInter
         allInter.append(singleInter)
     return allInter
+
+def sequenceInOrder(tup):
+    lastItem = None
+    for item in tup:
+        if currentItem = None:
+            lastItem = item
+        else:
+            if item-lastItem != 1:
+                return False
+    return True
+
                 
 
                 
