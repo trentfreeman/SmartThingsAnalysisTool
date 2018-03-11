@@ -82,7 +82,11 @@ class method:
         self.name = name
         self.app = app
         self.variables = []
-        self.tree = createTree(text.split(': ')[1], self, app)
+        self.tree = self.createTree(text.split(': ')[1], self, app)
+
+    def createTree(self, text,method,app):
+        textArr = splitBrack(text)
+        return parse(textArr, method, app)
 
     def asString(self):
         string = ""
@@ -104,17 +108,17 @@ class expresNode(baseNode):
     def __init__(self, arr, method, app,text, deviceExpres = False):
         self.hasState = False
         self.deviceExpres = deviceExpres
-        self.right = arr[0].strip('[]() ')
-        if 'state.' in self.right.lower() or 'atomicstate.' in self.right.lower():
+        self.left = arr[0].strip('[]() ')
+        if 'state.' in self.left.lower() or 'atomicstate.' in self.left.lower():
             self.hasState = True
-            if not(self.right in app.StateVar):
-                app.StateVar += [self.right]
+            if not(self.left in app.StateVar):
+                app.StateVar += [self.left]
         if len(arr)>1:
-            self.left = arr[1].strip('[]() ')
-            if 'state.' in self.left.lower() or 'atomicstate.' in self.left.lower():
+            self.right = arr[1].strip('[]() ')
+            if 'state.' in self.right.lower() or 'atomicstate.' in self.right.lower():
                 self.hasState = True
-                if not(self.left in app.StateVar):
-                    app.StateVar += [self.left]
+                if not(self.right in app.StateVar):
+                    app.StateVar += [self.right]
         self.app = app
         self.method = method
         self.nextNode = parse(text, method, app) 
@@ -122,9 +126,9 @@ class expresNode(baseNode):
     def asString(self):
         string = ""
         if self.deviceExpres == True:
-            string = '[('+self.right + ' -> ' + self.left+')]' 
+            string = '[('+self.left + ' -> ' + self.right+')]' 
         else:
-            string = '[('+ self.right + ' = ' + self.left+')]'
+            string = '[('+ self.left + ' = ' + self.right+')]'
         if self.nextNode != None:
             string += self.nextNode.asString()
         return string 
@@ -219,6 +223,7 @@ class allPaths:
 ############# Comparison FUNCTIONS ###################################
 class compareInterPathStarts:
     def __init__(self, path, starts):
+        #for item in path array is a tuple of indicies that indicate where the first path nodes are in the interleaving.
         self.path1Placements = path[0]
         self.pathInter = path[1:]
         self.starts = starts
@@ -227,8 +232,8 @@ class compareInterPathStarts:
         racePossible = False
         tup = self.path1Placements
         #if a path is using state variables
-        isUsingState Arr = [False,False]
-        if (tup[0] == len(pathInter) - len(tup) or tup[0] = 0) and sequenceInOrder(tup):
+        isUsingStateArr = [False,False]
+        if (tup[0] == len(self.pathInter) - len(tup) or tup[0] == 0) and sequenceInOrder(tup):
             return False
         else:
             itemPathNum = None
@@ -239,10 +244,21 @@ class compareInterPathStarts:
                 else:
                     itemPathNum = 2
                 classType = item.__class__.__name__
-                if classType = 'expresNode':
+                if classType == 'expresNode':
                     if item.hasState and 'state' in item.left:
-                        isUsingStateArr[itemPathNum-1] = 1
-#TODO CHECK FOR RACES (if both are editing state variables)
+                        if (itemPathNum == 1 and isUsingStateArr[1] == True) or (itemPathNum == 2 and isUsingStateArr[0]):
+                            return True
+                        isUsingStateArr[itemPathNum-1] = True
+            return False
+
+    def startsSequences(self):
+        sequenceStates = []
+        for item in self.pathInter:
+            classType = item.__class__.__name__
+            if classType == 'expresNode' and item.deviceExpres:
+                sequenceStates += [item.left +'->'+item.right]
+        return sequenceStates
+
 
 
             
@@ -282,10 +298,6 @@ def splitCommas(string):
             retArr.append(retStr)
     return retArr
 
-
-def createTree(text,method,app):
-    textArr = splitBrack(text)
-    return parse(textArr, method, app)
 
 
 def parse(textArr, method, app):
@@ -328,7 +340,7 @@ def initializeString(fileName):
     #fix for multiple apps
     string = string.lower()
     stringArr = string.split('\n')
-    methods = stringArr[stringArr.index('DECLARED METHODS') +1:stringArr.index('Starting Points: []')]
+    methods = stringArr[stringArr.index('declared methods') +1:stringArr.index('starting points: []')]
     #code below is to replace method calls within methods with their text (very annoying)
     for line in methods:
         matches =[x.lower() for x in methods if x.split(': ')[0].lower() in line.split(': ')[1].lower()]
@@ -342,7 +354,7 @@ def initializeString(fileName):
                     #On second thought i dont know if this works the way i want it to. surprise surprise
                     methodSplit[methodSplit.index(text)] = re.sub(re.escape(match.split(': ')[0]) + '\(.*\)', match.split(': ')[1], text, flags=re.IGNORECASE)
         methods[methods.index(line)] = line.split(': ')[0] + ': ' + ''.join(methodSplit)
-    stringArr[stringArr.index('DECLARED METHODS') +1:stringArr.index('Starting Points: []')] = methods
+    stringArr[stringArr.index('declared methods') +1:stringArr.index('starting points: []')] = methods
     return stringArr
 
 
@@ -392,7 +404,7 @@ def getAllPossibleStarts(app):
     return allStarts
 
 #taken and adapted from https://stackoverflow.com/questions/15306231/how-to-calculate-all-interleavings-of-two-lists
-def interleaving(path1, path2):
+def interleavings(path1, path2):
     allInter = []
     singleInter = [None]*(len(path1) +len(path2))
     for combo in itertools.combinations(range(0,len(singleInter)), len(path1)):
@@ -413,7 +425,7 @@ def interleaving(path1, path2):
 def sequenceInOrder(tup):
     lastItem = None
     for item in tup:
-        if currentItem = None:
+        if lastItem == None:
             lastItem = item
         else:
             if item-lastItem != 1:
