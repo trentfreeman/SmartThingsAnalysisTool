@@ -1,0 +1,24 @@
+processing hall-light-welcome-home.groovy
+req caps: [capability.contactsensor, capability.switch, capability.presencesensor]
+req cap size: 3
+requested commands:[off, on]
+requested attrs:[presence, contact, switch]
+called cap-methods by app
+on
+called cap-props by app
+presence
+contact
+attribute uses through subscriptions
+presence
+contact
+cmd overpriv:[off]
+attr overpriv:[switch]
+^^^^^^^^-OVERPRIVILEGED-^^^^^^^
+DECLARED METHODS
+installed: [(this.init())]
+updated: [this.unsubscribe()][(this.init())]
+init: [(state.lastClosed = this.now())][this.subscribe(people, presence.present, presence)][this.subscribe(sensors, contact.open, doorOpened)]
+presence: [(delay = (contactDelay) ? contactDelay : 10)][(state.lastPresence = this.now())][If ((this.now() - (delay * 1000)) < state.lastContact), [(lights?.on())], ], 
+doorOpened: [(delay = (presenceDelay) ? presenceDelay : 30)][(state.lastContact = this.now())][If ((this.now() - (delay * 1000)) < state.lastPresence), [(lights?.on())], ], 
+Starting Points: []
+IT HAS STATE

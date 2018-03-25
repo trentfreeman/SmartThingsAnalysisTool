@@ -130,9 +130,12 @@ class OPAnalysisAST extends CompilationCustomizer
 				}else if (state.getText().contains("subscribe")) {
 					methTree = methTree + "[" + state.getText() + "]"
 				} else if (reqAttr.each {x -> state.getText().contains(x )}){
+					println 'HI ' + state.getText()
 					if (state.getExpression() instanceof MethodCallExpression) {
 						if (state.getExpression().getArguments()[0] instanceof ClosureExpression) {
 							methTree = methTree + "[(" + state.getExpression().getText() + state.getExpression().getArguments()[0].getCode().getText() + ")]"
+						}else if (!(state.getText().contains("log"))) {
+							methTree = methTree + "[(" + state.getExpression().getText() + ")]"
 						}
 					}else {
 						methTree = methTree + "[" + state.getText() + "]"
@@ -143,9 +146,9 @@ class OPAnalysisAST extends CompilationCustomizer
 				return methTree
 			}else if (state instanceof IfStatement) {
 				def ifStatementCopy = state
-				methTree = methTree + "[If " + state.getBooleanExpression().getText() + ","
-				methTree = methTree + makeTreeBranching("", [ifStatementCopy.getIfBlock()]) + ","
-				methTree = methTree + makeTreeBranching("", [ifStatementCopy.getElseBlock()]) + "],"
+				methTree = methTree + "[If " + state.getBooleanExpression().getText() + ", "
+				methTree = methTree + makeTreeBranching("", [ifStatementCopy.getIfBlock()]) + ", "
+				methTree = methTree + makeTreeBranching("", [ifStatementCopy.getElseBlock()]) + "], "
 				statements.removeAt(0)
 				methTree = makeTreeBranching(methTree, statements)
 				return methTree
