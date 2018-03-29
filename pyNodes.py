@@ -143,12 +143,13 @@ class baseNode():
         self.nextNode = None
         self.method = method
         self.app = self.method.app
+        self.hasState = False
 
 class expresNode(baseNode):
     def __init__(self, arr, method, app,text, deviceExpres = False):
-        self.hasState = False
         self.deviceExpres = deviceExpres
         self.left = arr[0].strip('[]() ')
+        self.hasState = False
         inStateVar = False
         if 'state.' in self.left.lower() or 'atomicstate.' in self.left.lower():
             self.hasState = True
@@ -206,6 +207,8 @@ class ifNode(baseNode):
         self.trueBranch = None
         self.falseBranch = None
         #TODO: ADD || to if state
+        if 'state.' in ifArray[0].strip():
+            self.hasState = True
         self.ifState = ifArray[0].strip().split('&&')
         for item in app.StateVar:
             if [x for x in self.ifState if item.name in x] and item.typeOf != 'bool':
@@ -323,8 +326,8 @@ class compareInterPathStarts:
         path2NodesLeft = len(pathInter) - len(tup)
         retVal = False
         sequenceStates = []
-        path1Final = None
-        path2Final = None
+        path1Final = {'state': [], 'devices': []}
+        path2Final = {'state': [], 'devices': []}
         racePossible = False
         #if a path is using state variables
         isUsingStateArr = [False,False]
@@ -332,30 +335,32 @@ class compareInterPathStarts:
         for item in pathInter:
             #get the sequence of state changes as they happen
             classType = item.__class__.__name__
-            if classType == 'expresNode' and item.deviceExpres:
+            if classType == 'expresNode' and (item.deviceExpres or item.hasState):
                 if pathInter.index(item) in tup:
-                    path1Final = [item.left+'->'+item.right]
+                    if item.hasState:
+                        path1Final['state'] = [item.left+'->'+item.right]
+                    path1Final['devices'] = [item.left+'->'+item.right]
                 else:
-                    path2Final = [item.left+'->'+item.right]
+                    if item.hasState:
+                        path2Final['state'] = [item.left+'->'+item.right]
+                    path2Final['devices'] = [item.left+'->'+item.right]
                 sequenceStates += [item.left +'->'+item.right]
             #determine if race possible
             if pathInter.index(item) in tup:
-                itemPathNum = 1
                 tup = tup[1:]
+                if item.hasState:
+                    isUsingStateArr[0] = True
                 if len(tup) == 0:
                     isUsingStateArr[0] = False
             else:
                 path2NodesLeft -=1
+                if item.hasState:
+                    isUsingStateArr[1] = True
                 if path2NodesLeft == 0:
                     isUsingStateArr[1] =False
-                itemPathNum = 2
-
             classType = item.__class__.__name__
-            if classType == 'expresNode':
-                if item.hasState and 'state' in item.left:
-                    if (itemPathNum == 1 and isUsingStateArr[1] == True) or (itemPathNum == 2 and isUsingStateArr[0]):
-                        retVal = True
-                    isUsingStateArr[itemPathNum-1] = True
+            if (isUsingStateArr[1] and isUsingStateArr[0]):
+                retVal = True
         return {'path1Order': path[0], 'racePossible': retVal, 'path1State': path1Final, 'path2State': path2Final, 'sequenceStates': sequenceStates}
 
     def startsSequences(self):
@@ -372,7 +377,32 @@ class compareInterPathStarts:
 
 
 
-            
+############# Class to parse Results ###########################
+class resultsOfStart:
+    def __init__(self, resultArr):
+        self.start = resultArr[0]
+        self.pathResultsArr = []
+        for item in resultArr[1]:
+            x = pathResults(item)
+            self.pathResultsArr += [x]
+        
+class pathResults:
+    def __init__(self, pathsResults):
+        self.path1 = pathsResults[0]
+        self.path2 = pathsResults[1]
+        self.results = []
+        for item in pathsResults[2]:
+            x = result(item)
+            self.results +=[x]
+
+class result:
+    def __init__(self, resDict):
+        self.path1Final = resDict['path1State']
+        self.path2Final = resDict['path2State']
+        self.sequenceStates= resDict['sequenceStates']
+        self.racePossible = resDict['racePossible']
+        self.path1Order = resDict['path1Order']
+
 ############# Helper FUNCTIONS #################################
 def splitBrack(string):
     left = 0
@@ -560,6 +590,10 @@ paths.findPaths()
 starts = getAllPossibleStarts(testApp)
 testInter = compareInterPathStarts(paths, starts)
 results = testInter.runTest()
+startResultsArr = []
+for item in results:
+    x = resultsOfStart(item)
+    startResultsArr += [x]
 # RESULT DESCRIPTION
 # x is variable to change, z is an arbitrary number
 # first level = results[x]: array of [startVariableArray, all results associated with start] DON'T USE: LARGE OUTPUT
@@ -578,6 +612,7 @@ results = testInter.runTest()
 # final two lines are the number of times the sequence of state changes in the interleavings matched the atomic interleaving sequence.
 
 # This isnt clean right now, but it gets my results. 
+'''
 for start in results:
     print("START")
     print(start[0])
@@ -612,3 +647,4 @@ for start in results:
         print(countSameAsAtomic12)
         print("COUNT STATE CHANGE SAME AS p1->p2 ATOMIC: ", end = "")
         print(countSameAsAtomic21)
+'''

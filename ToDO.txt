@@ -1,0 +1,5 @@
+Make class structure to make easier to get results
+
+Make sure state is grabbed at first acces and given up at final path node
+
+Keep track of path edits state
