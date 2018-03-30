@@ -391,9 +391,41 @@ class pathResults:
         self.path1 = pathsResults[0]
         self.path2 = pathsResults[1]
         self.results = []
-        for item in pathsResults[2]:
+        self.countRaces = 0
+        self.path12Atomic = result(pathsResults[2][0])
+        self.path21Atomic = result(pathsResults[2][-1])
+        for item in pathsResults[2][3:-1]:
             x = result(item)
             self.results +=[x]
+        
+        def countRaces(self):
+            for item in results:
+                if item.racePossible:
+                    self.countRaces +=1
+
+        def compareSequences(self):
+            count = 0
+            sameAs12 = 0
+            sameAs21 = 0
+            for item in self.results:
+                if item.sequenceStates == self.path12Atomic.sequenceStates:
+                    count +=1
+                    sameAs12 +=1
+                elif item.sequenceStates == self.path21Atomic:
+                    count+=1
+                    sameAs21 +=1
+            self.sameSequences = [count, sameAs12, sameAs21]
+
+        '''
+        def compareFinalStates(self):
+            stateFound = False
+            devFound = False
+            results12Final = []
+            restuls21Final = []
+            for item in reversed(self.path12Atomic.sequenceStates):
+                if 'state.' in item and :
+        '''
+
 
 class result:
     def __init__(self, resDict):
